@@ -36,8 +36,22 @@ return {
     lazy = false,                    -- start plugin (loads at startup)
     priority = 1000,                 -- load before other start plugins
     opts = {
-      flavour = "mocha",             -- or "auto" to follow :set background
+      flavour = "frappe",             -- or "auto" to follow :set background
       transparent_background = true, -- you can drop your manual bg = "none"
+      color_overrides = {
+        frappe = {
+          crust = "#1e1e27",
+          mantle = "#2c2f40",
+          base = "#24273a",
+          green = "#8ad1bb",
+          peach = "#f4a88d",
+          yellow = "#f4c99a",
+          teal = "#a8e7dd",
+          blue = "#7eabf3",
+          pink = "#f4b8e4",
+
+        },
+      },
       term_colors = true,
       integrations = {
         treesitter = true,
@@ -46,13 +60,25 @@ return {
         gitsigns = true,
         lsp_trouble = true,
       },
-      custom_highlights = function(C)
-        return {
-          StatusLine   = { fg = C.overlay2, bg = "NONE" },  -- softer gray, no bg
-          StatusLineNC = { fg = C.surface2, bg = "NONE" },
-          WinSeparator = { fg = C.surface1, bg = "NONE" },  -- optional: subtle split line
-          ModeMsg      = { fg = C.overlay2 },               -- optional: "-- INSERT --" color
-        }
+    custom_highlights = function(C)
+      return {
+        -- statusline (active/inactive)
+        StatusLine   = { fg = "#848faa", bg = "#262938", bold = false },
+        StatusLineNC = { fg = C.surface2, bg = "NONE" },
+
+        -- message/command area
+        MsgArea      = { fg = "#848faa",     bg = "NONE" },
+        MsgSeparator = { fg = C.surface1, bg = "NONE" },
+
+        -- common message kinds
+        ModeMsg      = { fg = C.green,     bg = "NONE", bold = true },
+        MoreMsg      = { fg = "#c2cef8",    bg = "NONE", bold = false },
+        WarningMsg   = { fg = C.peach,    bg = "NONE", bold = false },
+        ErrorMsg     = { fg = C.red,      bg = "NONE", bold = false },
+
+        -- optional: window split line
+        WinSeparator = { fg = C.surface1, bg = "NONE" },
+      }
       end,
     },
     config = function(_, opts)
