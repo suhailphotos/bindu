@@ -88,7 +88,22 @@ return {
       },
 
       custom_highlights = function(C)
+        -- choose per-flavour so Mocha/Frappe get different greys if you want
+        local flav = (vim.g.catppuccin_flavour or "mocha"):lower()
+        local comment_fg = (flav == "mocha") and "#6b7093" or "#848faa"  -- Mocha | Frappe
+
         return {
+          -- comments
+          Comment        = { fg = comment_fg, italic = false },   -- regex highlighting
+          ["@comment"]   = { fg = comment_fg, italic = false },   -- Treesitter
+
+          -- (optional) special comment kinds
+          ["@comment.todo"]     = { fg = C.peach,    bold = true },
+          ["@comment.note"]     = { fg = C.lavender, italic = true },
+          ["@comment.warning"]  = { fg = C.yellow,   bold = true },
+          ["@comment.error"]    = { fg = C.red,      bold = true },
+
+          -- your existing UI overrides …
           StatusLine   = { fg = "#848faa", bg = "#1e1f2f", bold = false },
           StatusLineNC = { fg = C.surface2, bg = "NONE" },
           MsgArea      = { fg = "#848faa", bg = "NONE" },
