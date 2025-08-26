@@ -104,9 +104,9 @@ return {
           ["@comment.error"]    = { fg = C.red,      bold = true },
 
           -- Python-specific tweaks (Treesitter captures)
-          ["@variable.builtin.python"]   = { fg = C.maroon,    italic = true  }, -- self / cls
-          ["@keyword.import.python"]     = { fg = C.mauve, italic = false }, -- import / from
-          ["@keyword.conditional.python"]= { fg = C.teal,     italic = false }, -- if / elif / else
+          ["@module.python"]             = { fg = C.text,      italic = true },
+          ["@string.documentation.python"] = { fg = comment_fg,    italic = true  }, -- self / cls
+          ["@variable.builtin.python"]   = { fg = C.teal,    italic = true  }, -- self / cls
 
           -- your existing UI overrides …
           StatusLine   = { fg = "#848faa", bg = "#1e1f2f", bold = false },
