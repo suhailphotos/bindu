@@ -78,7 +78,7 @@ return {
           sapphire = "#73bade",
           pink     = "#f4a5dc",
           mauve    = "#e176bf",
-          lavender = "#c5cff5",
+          lavender = "#8a9bf2",
           teal     = "#97cde8",
         },
       },
@@ -102,6 +102,11 @@ return {
           ["@comment.note"]     = { fg = C.lavender, italic = true },
           ["@comment.warning"]  = { fg = C.yellow,   bold = true },
           ["@comment.error"]    = { fg = C.red,      bold = true },
+
+          -- Python-specific tweaks (Treesitter captures)
+          ["@variable.builtin.python"]   = { fg = C.maroon,    italic = true  }, -- self / cls
+          ["@keyword.import.python"]     = { fg = C.mauve, italic = false }, -- import / from
+          ["@keyword.conditional.python"]= { fg = C.teal,     italic = false }, -- if / elif / else
 
           -- your existing UI overrides …
           StatusLine   = { fg = "#848faa", bg = "#1e1f2f", bold = false },
@@ -175,6 +180,13 @@ return {
         end
       end
 
+      -- Clear terminal palette when switching away from Catppuccin so other themes are authentic
+      local function clear_term_colors()
+        for i = 0, 15 do vim.g["terminal_color_" .. i] = nil end
+        vim.g.terminal_color_foreground = nil
+        vim.g.terminal_color_background = nil
+      end
+
       vim.api.nvim_create_user_command("TransparentOn", function()
         vim.env.NVIM_TRANSPARENT = "1"
         opts.transparent_background = true
@@ -193,6 +205,15 @@ return {
         opts.transparent_background = not on
         reapply_if_catppuccin()
       end, {})
+
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        group = vim.api.nvim_create_augroup("SuhailTermReset", { clear = true }),
+        callback = function()
+          if not (vim.g.colors_name or ""):match("^catppuccin") then
+            clear_term_colors()
+          end
+        end,
+      })
     end,
   },
 

@@ -11,7 +11,11 @@ vim.opt.smartindent = true
 vim.opt.wrap = false
 vim.opt.swapfile = false
 vim.opt.backup = false
-vim.opt.undodir = (os.getenv("HOME") or "~") .. "/.vim/undodir"
+
+-- vim.opt.undodir = (os.getenv("HOME") or "~") .. "/.vim/undodir"
+local undodir = vim.fn.expand("~/.vim/undodir")
+if vim.fn.isdirectory(undodir) == 0 then vim.fn.mkdir(undodir, "p") end
+vim.opt.undodir = undodir
 vim.opt.undofile = true
 
 vim.opt.hlsearch = false
