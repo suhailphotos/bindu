@@ -89,7 +89,7 @@ return {
 
       custom_highlights = function(C)
         return {
-          StatusLine   = { fg = "#848faa", bg = "#262938", bold = false },
+          StatusLine   = { fg = "#848faa", bg = "#1e1f2f", bold = false },
           StatusLineNC = { fg = C.surface2, bg = "NONE" },
           MsgArea      = { fg = "#848faa", bg = "NONE" },
           MsgSeparator = { fg = C.surface1, bg = "NONE" },
