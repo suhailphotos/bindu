@@ -86,8 +86,8 @@ truncation_symbol = "…/"
 # - path              (subdirs under repo root): italic, "current" color
 format = '[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path ]($style)'
 before_repo_root_style = 'fg:path_parent'
-repo_root_style        = 'italic fg:path_current'
-style                  = 'italic fg:path_default'
+repo_root_style        = 'fg:path_current'
+style                  = 'fg:path_default'
 
 # ----------
 # Character
