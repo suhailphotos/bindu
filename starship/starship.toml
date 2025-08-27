@@ -118,7 +118,7 @@ format = ' [$time](fg:dim) '                  # ← trailing space (you already 
 # venv name from PROMPT_PY_ENV_NAME: add trailing space after the joining dot
 [env_var.py_name]
 variable = "PROMPT_PY_ENV_NAME"
-format   = '[$env_value](italic fg:python_fg) '
+format   = '[$env_value](bold fg:python_fg) '
 
 # Python glyph only; add trailing space (no leading dot)
 [python]
@@ -132,7 +132,7 @@ format             = ' [$symbol]($style) '
 [conda]
 symbol = ''
 style  = 'fg:dim'
-format = '[🅒](fg:dim) [$environment](italic fg:python_fg) '
+format = '[🅒](fg:dim) [$environment](bold fg:python_fg) '
 
 # ----------
 # Git status (dot + special parentheses, palette-driven colors)
