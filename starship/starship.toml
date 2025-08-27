@@ -86,7 +86,7 @@ truncation_symbol = "…/"
 # - path              (subdirs under repo root): italic, "current" color
 format = '[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path ]($style)'
 before_repo_root_style = 'fg:path_parent'
-repo_root_style        = 'fg:path_current'
+repo_root_style        = 'bold fg:path_current'
 style                  = 'fg:path_default'
 
 # ----------
@@ -169,13 +169,12 @@ style = "italic fg:git_branch"
 
 [palettes.suhail-macos-ansi]
 ui_mono        = "bright-black"
-ui_white       = "white"
 dim            = "bright-black"
 
 # path
-path_default   = "cyan"
+path_default   = "white"
 path_parent    = "bright-black"
-path_current   = "purple"
+path_current   = "bright-white"
 path_ellipsis  = "bright-black"
 # git
 git_branch     = "bright-black"
