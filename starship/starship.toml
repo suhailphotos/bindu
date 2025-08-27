@@ -54,14 +54,20 @@ FreeBSD     = " "
 # Hostname (built-in, fast)
 # --------------------------
 [hostname]
-disabled = false
+disabled = true
 ssh_only = false
 format = "[$hostname]($style) "
 style = "fg:host"
 
+
+# ----------------------------
+# Environment Variables
+# ----------------------------
 [env_var.not_home]
+disabled = true
 variable = "STARSHIP_NOT_HOME"
 format = '[  ](fg:dim)'
+
 
 # ---------------
 # Directory path
@@ -72,7 +78,7 @@ truncation_length = 2
 truncate_to_repo = true
 use_os_path_sep = true
 home_symbol = "~"
-#truncation_symbol = "…/"
+truncation_symbol = "…/"
 
 # Look
 # - before_root_path  (stuff above repo root): dim (like your "parent")
@@ -163,7 +169,9 @@ style = "italic fg:git_branch"
 
 [palettes.suhail-macos-ansi]
 ui_mono        = "bright-black"
+ui_white       = "white"
 dim            = "bright-black"
+
 # path
 path_default   = "cyan"
 path_parent    = "bright-black"
