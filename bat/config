@@ -1,3 +1,6 @@
-# placeholder — managed by helix/dotfiles
-# safe to leave empty; defaults still apply
+# Use the terminal's 16-color ANSI palette
+--theme=ansi
 
+# (optional) If you mainly use bat as a cat replacement,
+# keep output minimal; otherwise omit this.
+# --style=plain
