@@ -107,7 +107,8 @@ format = ' [${status}](fg:err) '              # ← trailing space
 # Command Duration
 # --------------------------------------------------
 [cmd_duration]
-min_time = 5_000
+disabled = true
+min_time = 2_000
 show_milliseconds = false
 min_time_to_notify = 45_000
 format = ' [$duration](fg:dim) '
@@ -117,6 +118,7 @@ symbol = '⚙'
 format = ' [$symbol$number](fg:dim) '
 
 [time]
+disabled = true
 time_format = '%H:%M'
 format = ' [$time](fg:dim) '
 
