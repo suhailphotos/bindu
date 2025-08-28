@@ -77,8 +77,8 @@ keybind = cmd+ctrl+e=equalize_splits
 keybind = cmd+ctrl+x=close_surface
 
 # Default window dimensions in cells (columns x rows)
-window-width = 190
-window-height = 52
+window-width = 150
+window-height = 42
 
 
 # --- themes ---
