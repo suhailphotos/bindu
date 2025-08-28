@@ -103,17 +103,22 @@ error_symbol   = '[%](bold fg:err)'
 disabled = false
 format = ' [${status}](fg:err) '              # ← trailing space
 
+# --------------------------------------------------
+# Command Duration
+# --------------------------------------------------
 [cmd_duration]
-min_time = 3000
-format = ' [$duration](fg:dim) '              # ← trailing space
+min_time = 5_000
+show_milliseconds = false
+min_time_to_notify = 45_000
+format = ' [$duration](fg:dim) '
 
 [jobs]
 symbol = '⚙'
-format = ' [$symbol$number](fg:dim) '         # ← trailing space
+format = ' [$symbol$number](fg:dim) '
 
 [time]
 time_format = '%H:%M'
-format = ' [$time](fg:dim) '                  # ← trailing space (you already had this)
+format = ' [$time](fg:dim) '
 
 # venv name from PROMPT_PY_ENV_NAME: add trailing space after the joining dot
 [env_var.py_name]
@@ -161,6 +166,8 @@ diverged    = '[·](fg:dim)[⇕](bold fg:git_diverged)[⇡](fg:git_ahead)[${ahea
 symbol = "·"
 format = " [$symbol](fg:dim)[$branch]($style)"
 style = "italic fg:git_branch"
+
+
 
 # =========================
 # Palettes (role → color)
