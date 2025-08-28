@@ -73,27 +73,65 @@ return {
     dependencies = { "catppuccin/nvim" },
     config = function()
       local lilac = require("lilac")
-      lilac.setup({
-        transparent = true,
-        integrations = { treesitter = true, telescope = true, gitsigns = true, lsp_trouble = true },
-      })
-      -- IMPORTANT: call the loader directly (no :colorscheme hop here)
-      lilac.load("lilac-nightbloom")
 
-      -- handy helpers
+      -- ---------- helpers ----------
+      local function detect_os_appearance()
+        -- hard override via env if you want (great for tmux/SSH): NVIM_BG=dark|light
+        if vim.env.NVIM_BG == "dark" or vim.env.NVIM_BG == "light" then
+          return vim.env.NVIM_BG
+        end
+        -- macOS: read system appearance ("Dark" means dark; empty => light)
+        if vim.fn.has("mac") == 1 then
+          local out = vim.fn.systemlist([[defaults read -g AppleInterfaceStyle 2>/dev/null]])[1]
+          return (out == "Dark") and "dark" or "light"
+        end
+        -- fallback: keep whatever Neovim already has (defaults to "dark" in many setups)
+        return (vim.o.background == "light") and "light" or "dark"
+      end
+
+      local function load_lilac_for(bg)
+        vim.o.background = bg
+        local id = (bg == "dark") and "lilac-nightbloom" or "lilac-pearlbloom"
+        lilac.setup({
+          transparent = true,
+          integrations = { treesitter = true, telescope = true, gitsigns = true, lsp_trouble = true },
+        })
+        lilac.load(id)
+      end
+
+      local function apply_auto()
+        local want = detect_os_appearance()
+        local have = (vim.o.background == "light") and "light" or "dark"
+        if (want ~= have) or not ((vim.g.colors_name or ""):match("^lilac%-")) then
+          load_lilac_for(want)
+        end
+      end
+
+      -- ---------- initial apply ----------
+      apply_auto()
+
+      -- Re-check when focus returns (e.g., you toggled OS theme)
+      vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, {
+        callback = function() apply_auto() end,
+      })
+
+      -- Handy commands
+      vim.api.nvim_create_user_command("LilacAuto", apply_auto, {})
+      vim.api.nvim_create_user_command("LilacLight", function() load_lilac_for("light") end, {})
+      vim.api.nvim_create_user_command("LilacDark",  function() load_lilac_for("dark")  end, {})
+
+      -- Status & transparency toggles you already had
       vim.api.nvim_create_user_command("LilacStatus", function()
         local name = vim.g.colors_name or "(none)"
         local okF, F = pcall(require, "lilac.flavors")
         local flav = (okF and F.index[name] and F.index[name].variant) or "?"
-        local trans = lilac._opts and (lilac._opts.transparent and "on" or "off") or "?"
+        local trans = (lilac._opts and lilac._opts.transparent) and "on" or "off"
         vim.notify(("Lilac: %s  •  base=%s  •  transparent=%s"):format(name, flav, trans))
       end, {})
 
       vim.api.nvim_create_user_command("LilacTransparentToggle", function()
         lilac.toggle_transparent()
       end, {})
-
-      -- backwards-compatible aliases
       vim.api.nvim_create_user_command("TransparentToggle", function()
         lilac.toggle_transparent()
       end, {})
