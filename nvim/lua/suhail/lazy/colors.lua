@@ -76,16 +76,12 @@ return {
 
       -- ---------- helpers ----------
       local function detect_os_appearance()
-        -- hard override via env if you want (great for tmux/SSH): NVIM_BG=dark|light
-        if vim.env.NVIM_BG == "dark" or vim.env.NVIM_BG == "light" then
-          return vim.env.NVIM_BG
-        end
-        -- macOS: read system appearance ("Dark" means dark; empty => light)
+        local env = (vim.env.NVIM_BG or ""):lower()
+        if env == "dark" or env == "light" then return env end
         if vim.fn.has("mac") == 1 then
           local out = vim.fn.systemlist([[defaults read -g AppleInterfaceStyle 2>/dev/null]])[1]
           return (out == "Dark") and "dark" or "light"
         end
-        -- fallback: keep whatever Neovim already has (defaults to "dark" in many setups)
         return (vim.o.background == "light") and "light" or "dark"
       end
 
