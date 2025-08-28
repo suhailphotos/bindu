@@ -1,3 +1,23 @@
 # placeholder — managed by helix/dotfiles
-# safe to leave empty; defaults still apply
+# ~/.config/git/config
+[user]
+  name = Suhail Suhail
+  email = suhailece@gmail.com
+  # Optional: fail fast if identity is missing anywhere
+  useConfigOnly = true
 
+[core]
+  editor = nvim
+  excludesFile = ~/.config/git/ignore   # global ignore (see next section)
+
+[init]
+  defaultBranch = main
+
+[pull]
+  rebase = false       # or true if you prefer rebase
+
+[fetch]
+  prune = true
+
+[include]
+  path = ~/.config/git/delta.gitconfig  # you already track this

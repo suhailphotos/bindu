@@ -1,0 +1,12 @@
+# ~/.config/git/ignore
+.DS_Store
+.AppleDouble
+.LSOverride
+.Spotlight-V100
+.Trashes
+.fseventsd
+# Editor cruft
+*~
+*.swp
+*.swo
+._*
