@@ -70,7 +70,7 @@ format = '[  ](fg:dim)'
 
 [env_var.tmux]
 variable = "TMUX"
-format = '[ ](fg:ui_mono)'
+format = '[󱗾 ](fg:ui_mono)'
 disabled = false
 
 
