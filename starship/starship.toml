@@ -7,7 +7,7 @@ palette = "suhail-macos-ansi"
 # =========================
 # Prompt layout
 # =========================
-format = '$os$hostname${env_var.not_home}$directory$python${env_var.py_name}$conda$git_branch$git_status$status$cmd_duration$line_break$character'
+format = '$os$hostname${env_var.not_home}$directory${env_var.tmux}$python${env_var.py_name}$conda$git_branch$git_status$status$cmd_duration$line_break$character'
 add_newline = true
 
 
@@ -68,6 +68,11 @@ disabled = true
 variable = "STARSHIP_NOT_HOME"
 format = '[  ](fg:dim)'
 
+[env_var.tmux]
+variable = "TMUX"
+format = '[ ](fg:ui_mono)'
+disabled = false
+
 
 # ---------------
 # Directory path
@@ -122,6 +127,9 @@ disabled = true
 time_format = '%H:%M'
 format = ' [$time](fg:dim) '
 
+# --------------------------------------------------
+# Python Environment
+# --------------------------------------------------
 # venv name from PROMPT_PY_ENV_NAME: add trailing space after the joining dot
 [env_var.py_name]
 variable = "PROMPT_PY_ENV_NAME"
