@@ -70,7 +70,7 @@ format = '[  ](fg:dim)'
 
 [env_var.tmux_seg]
 variable = "STARSHIP_TMUX_SEG"
-format = '[$env_value](fg:path_default)'
+format = '[$env_value](fg:ui_mono)'
 disabled = false
 
 
