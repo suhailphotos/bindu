@@ -1,0 +1,13 @@
+[manager]
+ratio = [1, 2, 3]
+sort_by = "natural"
+sort_sensitive = false
+sort_reverse = false
+sort_dir_first = true
+show_hidden = true
+
+[preview]
+max_width = 120
+max_height = 80
+tab_size = 2
+wrap = true
