@@ -33,7 +33,7 @@ window-padding-balance = true
 window-padding-color = extend
 
 # move the text baseline down
-adjust-font-baseline = -8
+# adjust-font-baseline = -8
 
 # if descenders look cramped, uncomment these:
 # adjust-cell-height = +1
