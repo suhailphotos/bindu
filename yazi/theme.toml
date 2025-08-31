@@ -1,1 +1,13 @@
+# icons only: monochrome bright-black (ANSI "darkgray")
+# we do NOT touch [mgr], [status], [tabs], or [filetype]
+[icon]
+dirs  = []
+files = []
+exts  = []
+globs = []
 
+prepend_conds = [
+  { if = "dir",           text = "", fg = "darkgrey" },
+  { if = "link",          text = "", fg = "darkgrey" },
+  { if = "!(dir | link)", text = "", fg = "darkgrey" }
+]
