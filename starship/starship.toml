@@ -17,7 +17,7 @@ add_newline = true
 [os]
 disabled = false
 format = "[$symbol]($style)"
-style = "fg:ui_mono"
+style = "fg:dim"
 
 [os.symbols]
 # mac / windows
@@ -238,7 +238,7 @@ host           = "green"
 
 [palettes.suhail-windows-ansi]
 ui_mono        = "bright-black"
-dim            = "bright-black"
+dim            = "black"
 path_parent    = "bright-black"
 path_current   = "purple"
 path_ellipsis  = "bright-black"
