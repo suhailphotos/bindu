@@ -1,5 +1,5 @@
 # Example: <Enter> still opens; <Ctrl-e> opens the file in $EDITOR in a split tmux pane (if tmux)
-[[manager.prepend_keymap]]
+[[mgr.prepend_keymap]]
 on = ["<C-e>"]
 run = '''
 sh -c '
