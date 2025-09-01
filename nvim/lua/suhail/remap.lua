@@ -62,3 +62,12 @@ vim.keymap.set("n", "<leader>z", function()
     vim.cmd("wincmd _")
   end
 end, { desc = "Toggle zoom current split" })
+
+
+-- On-demand netrw (even if disabled by Yazi)
+vim.api.nvim_create_user_command("Netrw", function(opts)
+  -- re-enable built-in netrw *for this session*
+  vim.g.loaded_netrw = nil
+  vim.g.loaded_netrwPlugin = nil
+  vim.cmd("runtime! plugin/netrwPlugin.vim")
+
