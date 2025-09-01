@@ -34,8 +34,8 @@ Tip: run :LilacList to see all IDs, e.g. lilac-pearlbloom, lilac-nightbloom,
 ]]
 
 local DEFAULT_PALETTES = {
-  light = "lilac-mistbloom",
-  dark  = "lilac-mistbloom",
+  light = "lilac-pearlbloom",
+  dark  = "lilac-nightbloom",
 }
 
 -- Optional per-session overrides via env (great over SSH)
