@@ -102,6 +102,7 @@ window-height = 42
 # ----------------------------------------
 # active theme (dark/light pair)
 theme = dark:lilac-nightbloom,light:lilac-pearlbloom
+# theme = dark:lilac-mistbloom,light:lilac-mistbloom
 
 # quick switches
 # theme = dark:catppuccin-mocha,light:catppuccin-mocha
