@@ -7,7 +7,9 @@ palette = "suhail-macos-ansi"
 # =========================
 # Prompt layout
 # =========================
-format = '$os$hostname${env_var.not_home}$directory${env_var.tmux_seg}$python${env_var.py_name}$conda$git_branch$git_status$status$cmd_duration$line_break$character'
+format = '$os$hostname${env_var.not_home}$directory${env_var.tmux_seg}$python${env_var.py_name}$conda$git_branch$git_status${env_var.bindu_ahead}${env_var.bindu_behind}${env_var.bindu_diverged}$status$cmd_duration$line_break$character'
+
+
 add_newline = true
 
 
@@ -71,6 +73,26 @@ format = '[  ](fg:dim)'
 [env_var.tmux_seg]
 variable = "STARSHIP_TMUX_SEG"
 format = '[$env_value](fg:ui_mono)'
+disabled = false
+
+
+# ---- Bindu ------------
+[env_var.bindu_ahead]
+variable = "STARSHIP_BINDU_AHEAD"
+style = "fg:git_ahead"
+format = ' [$env_value]($style)'
+disabled = false
+
+[env_var.bindu_behind]
+variable = "STARSHIP_BINDU_BEHIND"
+style = "fg:git_behind"
+format = ' [$env_value]($style)'
+disabled = false
+
+[env_var.bindu_diverged]
+variable = "STARSHIP_BINDU_DIVERGED"
+style = "fg:git_diverged"
+format = ' [$env_value]($style)'
 disabled = false
 
 

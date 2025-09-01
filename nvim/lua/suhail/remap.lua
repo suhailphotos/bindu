@@ -64,10 +64,20 @@ vim.keymap.set("n", "<leader>z", function()
 end, { desc = "Toggle zoom current split" })
 
 
--- On-demand netrw (even if disabled by Yazi)
+-- On-demand netrw (coexists cleanly with Yazi)
 vim.api.nvim_create_user_command("Netrw", function(opts)
-  -- re-enable built-in netrw *for this session*
-  vim.g.loaded_netrw = nil
-  vim.g.loaded_netrwPlugin = nil
-  vim.cmd("runtime! plugin/netrwPlugin.vim")
+  -- If netrw isn't active (e.g. you disabled it somewhere), load it now
+  if vim.fn.exists(":Lexplore") ~= 2 then
+    vim.g.loaded_netrw = nil
+    vim.g.loaded_netrwPlugin = nil
+    vim.cmd("runtime! plugin/netrwPlugin.vim")
+  end
 
+  -- open provided path or the current file's directory
+  local target = (opts.args ~= "" and opts.args) or vim.fn.expand("%:p:h")
+  vim.cmd("Lexplore " .. vim.fn.fnameescape(target))
+end, {
+  nargs = "?",           -- :Netrw or :Netrw ~/Downloads
+  complete = "dir",
+  desc = "Open netrw (left explorer) without affecting Yazi",
+})
