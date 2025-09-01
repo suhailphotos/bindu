@@ -1,5 +1,6 @@
 vim.g.mapleader = " "
-vim.keymap.set('n', "<leader>pv", vim.cmd.Ex)
+-- Replace netrw “project view” with Yazi
+vim.keymap.set('n', "<leader>pv", "<cmd>Yazi<CR>", { desc = "Yazi: project view" })
 
 -- move selected lines up/down
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
@@ -38,3 +39,26 @@ vim.keymap.set("n", "<leader><leader>", function() vim.cmd("so") end)
 vim.keymap.set("n", "<C-f>", function()
   vim.fn.jobstart({"tmux", "neww", "tmux-sessionizer"}, { detach = true })
 end, { silent = true })
+
+-- ----------------------------------------
+-- Unified splits (match Ghostty & tmux)
+-- ----------------------------------------
+-- minus = down (horizontal split)
+vim.keymap.set("n", "<leader>-",  ":split<CR>",  { desc = "Split below (horizontal)" })
+-- backslash = right (vertical split)
+vim.keymap.set("n", "<leader>\\", ":vsplit<CR>", { desc = "Split right (vertical)" })
+
+-- helpers
+vim.keymap.set("n", "<leader>=", "<C-w>=", { desc = "Equalize splits" })
+
+-- optional zoom toggle similar to tmux zoom
+vim.keymap.set("n", "<leader>z", function()
+  if vim.t._zoomed then
+    vim.t._zoomed = false
+    vim.cmd("wincmd =")
+  else
+    vim.t._zoomed = true
+    vim.cmd("wincmd |")
+    vim.cmd("wincmd _")
+  end
+end, { desc = "Toggle zoom current split" })
