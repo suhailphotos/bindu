@@ -30,8 +30,8 @@ Useful commands:
 
 local DEFAULT_PALETTES = {
   -- choose any combination: "nord" or a Lilac id like "lilac-nightbloom"
-  light = "lilac-pearlbloom",
-  dark  = "lilac-nightbloom",
+  light = "nord",
+  dark  = "nord",
 }
 
 -- Optional per-session overrides via env (great over SSH)
