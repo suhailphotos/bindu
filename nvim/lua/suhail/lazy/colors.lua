@@ -99,13 +99,22 @@ return {
   -- Nord: stock setup (transparency only). We don't apply the scheme here.
   ---------------------------------------------------------------------------
   {
-    "gbprod/nord.nvim",
+    "nordtheme/vim",
     name = "nord",
-    lazy = false,          -- ensure it's configured before we might :colorscheme nord
+    lazy = false,          -- make sure it’s available before we might :colorscheme nord
     priority = 1100,
-    opts = { transparent = true },
-    config = function(_, opts)
-      require("nord").setup(opts)
+    -- For Vimscript colorschemes, set globals *before* applying the scheme.
+    init = function()
+      -- keep the “transparent” feel you had before
+      vim.g.nord_disable_background = 1
+      -- tasteful defaults; tweak if you like
+      vim.g.nord_contrast = 0
+      vim.g.nord_borders = 0
+      vim.g.nord_italic = 0
+      vim.g.nord_bold = 1
+      vim.g.nord_uniform_diff_background = 1
+      -- truecolor helps Nord look right
+      vim.opt.termguicolors = true
     end,
   },
 
