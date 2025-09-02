@@ -108,7 +108,7 @@ return {
       -- keep the “transparent” feel you had before
       vim.g.nord_disable_background = 1
       -- tasteful defaults; tweak if you like
-      vim.g.nord_contrast = 0
+      vim.g.nord_contrast = 1
       vim.g.nord_borders = 0
       vim.g.nord_italic = 0
       vim.g.nord_bold = 1
