@@ -6,7 +6,7 @@ Set your default light/dark palettes here. You can point both to the same ID
 to use a single look for light *and* dark. Example presets:
   light = "lilac-pearlbloom",  dark = "lilac-nightbloom"       -- different
   light = "lilac-mistbloom",   dark = "lilac-mistbloom"        -- same for both
-  light = "lilac-emberbloom",  dark = "lilac-mistbloom"        -- mix & match
+  light = "nord",              dark = "lilac-nightbloom"       -- mix external + Lilac
 
 Runtime behavior:
   • Background detection order:
@@ -18,8 +18,7 @@ Runtime behavior:
     If set, they replace the defaults below for this session only.
 
 Useful commands:
-  :LilacList                → list available palettes
-  :Lilac <id>               → preview any palette immediately
+  :Lilac <id>               → preview any Lilac palette immediately (e.g. lilac-nightbloom)
   :LilacAuto                → re-run detection and load the paired palette
   :LilacLight               → force-load DEFAULT_PALETTES.light
   :LilacDark                → force-load DEFAULT_PALETTES.dark
@@ -27,13 +26,10 @@ Useful commands:
   :LilacPairSet {light} {dark}
                             → set the pair for this session & apply current bg
   :LilacSame {id}           → set both light/dark to one id (session only)
-  :TransparentToggle / :TransparentOn / :TransparentOff
-
-Tip: run :LilacList to see all IDs, e.g. lilac-pearlbloom, lilac-nightbloom,
-     lilac-mistbloom (and future lilac-emberbloom).
 ]]
 
 local DEFAULT_PALETTES = {
+  -- choose any combination: "nord" or a Lilac id like "lilac-nightbloom"
   light = "nord",
   dark  = "nord",
 }
@@ -46,18 +42,8 @@ if vim.env.NVIM_LILAC_DARK and vim.env.NVIM_LILAC_DARK ~= "" then
   DEFAULT_PALETTES.dark = vim.env.NVIM_LILAC_DARK
 end
 
--- (kept for completeness; used only if you flip NVIM_TRANSPARENT=1)
-local function ColorMyPencils(color)
-  if vim.env.NVIM_TRANSPARENT == "1" then
-    color = color or "rose-pine"
-    vim.cmd.colorscheme(color)
-    vim.api.nvim_set_hl(0, "Normal",      { bg = "none" })
-    vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-  end
-end
-
 return {
-  -- Optional alternatives (unchanged)
+  -- Optional alternatives kept lazy (unchanged)
   {
     "folke/tokyonight.nvim",
     name = "tokyonight",
@@ -108,83 +94,24 @@ return {
       vim.api.nvim_create_user_command("XcodeWWDC",    function() use_xcode("wwdc")    end, {})
     end,
   },
+
+  ---------------------------------------------------------------------------
+  -- Nord: stock setup (transparency only). We don't apply the scheme here.
+  ---------------------------------------------------------------------------
   {
     "gbprod/nord.nvim",
     name = "nord",
-    lazy = false,          -- ensure setup runs before our loader might pick "nord"
-    priority = 1000,
-    opts = {
-      transparent = true,
-
-      -- This hook runs when Nord builds its palette.
-      -- We keep Nord's neutrals; only remap selected primaries per your table.
-      on_colors = function(c)  -- c is Nord's palette
-        local map = vim.g.NORD_PRIMARY_MAP or {}
-        if next(map) == nil then return end
-
-        -- Keep originals to copy from (e.g. green="cyan")
-        local orig = vim.tbl_extend("force", {}, c)
-
-        local function resolve(spec)
-          if not spec or spec == "keep" then return nil end
-          if type(spec) == "string" then
-            if spec:match("^#%x%x%x%x%x%x$") then
-              return spec
-            end
-            -- allow "cyan" or "@nord.cyan"
-            local key = spec:match("^@?nord%.([%a_]+)$") or spec
-            if orig[key] then return orig[key] end
-          end
-          return nil
-        end
-
-        -- Only these six are remappable
-        for _, k in ipairs({ "red","green","blue","cyan","magenta","yellow" }) do
-          local newv = resolve(map[k])
-          if newv then c[k] = newv end
-        end
-      end,
-    },
-
+    lazy = false,          -- ensure it's configured before we might :colorscheme nord
+    priority = 1100,
+    opts = { transparent = true },
     config = function(_, opts)
-      -- Your initial wish:
-      --   green  = use Nord's cyan
-      --   cyan   = custom violet (hex)
-      --   magenta= keep Nord default
-      vim.g.NORD_PRIMARY_MAP = {
-        green   = "cyan",
-        cyan    = "#8A2BE2",  -- tweak anytime
-        magenta = "keep",
-        -- red/blue/yellow omitted → keep Nord defaults
-      }
-
       require("nord").setup(opts)
-
-      -- helpers so you can tweak live without editing Lua
-      -- helpers so you can tweak live without editing Lua
-      vim.api.nvim_create_user_command("NordReload", function()
-        if (vim.g.colors_name or "") == "nord" then vim.cmd("colorscheme nord") end
-        vim.notify("Nord reloaded with NORD_PRIMARY_MAP")
-      end, {})
-
-      vim.api.nvim_create_user_command("NordMap", function(o)
-        local f = o.fargs
-        if #f ~= 2 then
-          vim.notify(
-            "Usage: :NordMap {red|green|blue|cyan|magenta|yellow} {#rrggbb|keep|red|green|blue|cyan|magenta|yellow}",
-            vim.log.levels.ERROR
-          )
-          return
-        end
-        local t, v = f[1], f[2]
-        vim.g.NORD_PRIMARY_MAP = vim.g.NORD_PRIMARY_MAP or {}
-        vim.g.NORD_PRIMARY_MAP[t] = v
-        if (vim.g.colors_name or "") == "nord" then vim.cmd("colorscheme nord") end
-        vim.notify(("Nord map: %s = %s"):format(t, v))
-      end, { nargs = "*" })
     end,
   },
-  -- Lilac (default)
+
+  ---------------------------------------------------------------------------
+  -- Lilac: driver for lilac-* palettes + auto light/dark pairing
+  ---------------------------------------------------------------------------
   {
     "suhailphotos/lilac",
     name = "lilac",
@@ -194,7 +121,6 @@ return {
     config = function()
       local lilac = require("lilac")
 
-      -- ---------- helpers ----------
       local function detect_os_appearance()
         local env = (vim.env.NVIM_BG or ""):lower()
         if env == "dark" or env == "light" then return env end
@@ -205,12 +131,10 @@ return {
         return (vim.o.background == "light") and "light" or "dark"
       end
 
-      -- If id starts with "lilac-", we load via Lilac; otherwise we try :colorscheme <id>.
+      -- If id starts with "lilac-", use lilac.load; otherwise :colorscheme <id>.
       local function load_for(bg)
         vim.o.background = bg
-        local lilac = require("lilac")
         local id = (bg == "dark") and DEFAULT_PALETTES.dark or DEFAULT_PALETTES.light
-
         if type(id) ~= "string" or id == "" then
           id = (bg == "dark") and "lilac-nightbloom" or "lilac-pearlbloom"
         end
@@ -222,6 +146,7 @@ return {
           })
           lilac.load(id)
         else
+          -- Non-Lilac schemes (e.g., "nord") are applied via :colorscheme
           local ok = pcall(vim.cmd.colorscheme, id)
           if not ok then
             vim.notify(("Colorscheme '%s' not found. Falling back to lilac."):format(id), vim.log.levels.WARN)
@@ -240,32 +165,20 @@ return {
         end
       end
 
-      -- ---------- initial apply ----------
+      -- initial apply + re-check on focus resume
       apply_auto()
+      vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, { callback = apply_auto })
 
-      -- re-check when focus returns (e.g. you toggled OS theme)
-      vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, {
-        callback = apply_auto,
-      })
-
-      -- ---------- commands ----------
+      -- pairing helpers
       vim.api.nvim_create_user_command("LilacAuto", apply_auto, {})
-
-      vim.api.nvim_create_user_command("LilacLight", function()
-        load_for("light")
-      end, {})
-
-      vim.api.nvim_create_user_command("LilacDark", function()
-        load_for("dark")
-      end, {})
-
+      vim.api.nvim_create_user_command("LilacLight", function() load_for("light") end, {})
+      vim.api.nvim_create_user_command("LilacDark",  function() load_for("dark")  end, {})
       vim.api.nvim_create_user_command("LilacPairStatus", function()
         local active = vim.g.colors_name or "(none)"
         local bg = (vim.o.background == "light") and "light" or "dark"
         local pair = ("light=%s  dark=%s"):format(DEFAULT_PALETTES.light, DEFAULT_PALETTES.dark)
         vim.notify(("Lilac pair: %s\nActive: %s (bg=%s)"):format(pair, active, bg))
       end, {})
-
       vim.api.nvim_create_user_command("LilacPairSet", function(opts)
         local args = {}
         for a in string.gmatch(opts.args or "", "%S+") do table.insert(args, a) end
@@ -274,12 +187,10 @@ return {
           return
         end
         DEFAULT_PALETTES.light, DEFAULT_PALETTES.dark = args[1], args[2]
-        -- apply immediately to the current background
         local bg = (vim.o.background == "light") and "light" or "dark"
         load_for(bg)
         vim.notify(("Lilac pair set: light=%s  dark=%s"):format(DEFAULT_PALETTES.light, DEFAULT_PALETTES.dark))
       end, { nargs = "*" })
-
       vim.api.nvim_create_user_command("LilacSame", function(opts)
         if not opts.args or opts.args == "" then
           vim.notify("Usage: :LilacSame {id}", vim.log.levels.ERROR)
@@ -291,31 +202,6 @@ return {
         load_for(bg)
         vim.notify(("Lilac pair set to same: %s"):format(opts.args))
       end, { nargs = 1 })
-
-      -- Status & transparency toggles (as before)
-      vim.api.nvim_create_user_command("LilacStatus", function()
-        local name = vim.g.colors_name or "(none)"
-        local okF, F = pcall(require, "lilac.flavors")
-        local flav = (okF and F.index[name] and F.index[name].variant) or "?"
-        local trans = (lilac._opts and lilac._opts.transparent) and "on" or "off"
-        vim.notify(("Lilac: %s  •  base=%s  •  transparent=%s"):format(name, flav, trans))
-      end, {})
-
-      vim.api.nvim_create_user_command("LilacTransparentToggle", lilac.toggle_transparent, {})
-      vim.api.nvim_create_user_command("TransparentToggle",      lilac.toggle_transparent, {})
-      vim.api.nvim_create_user_command("TransparentOn", function()
-        lilac.setup({ transparent = true })
-        if (vim.g.colors_name or ""):match("^lilac%-") then
-          lilac.load(vim.g.colors_name)
-        end
-      end, {})
-
-      vim.api.nvim_create_user_command("TransparentOff", function()
-        lilac.setup({ transparent = false })
-        if (vim.g.colors_name or ""):match("^lilac%-") then
-          lilac.load(vim.g.colors_name)
-        end
-      end, {})
     end,
   },
 }
