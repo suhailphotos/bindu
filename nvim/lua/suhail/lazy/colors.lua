@@ -130,9 +130,33 @@ return {
     config = function()
       local lilac = require("lilac")
 
-      local function detect_os_appearance()
+      local function is_lilac(id)
+        return type(id) == "string" and id:match("^lilac%-")
+      end
+
+      -- Single-theme: hard rule for bg (no OS/env checks).
+      -- Treat only pearlbloom as "light"; everything else as "dark".
+      local function fixed_bg_for_single(id)
+        if id == "lilac-pearlbloom" then return "light" end
+        return "dark"
+      end
+
+      local function load_one(id, bg)
+        vim.o.background = bg
+        if is_lilac(id) then
+          lilac.setup({
+            transparent = true,
+            integrations = { treesitter = true, telescope = true, gitsigns = true, lsp_trouble = true },
+          })
+          lilac.load(id)
+        else
+          pcall(vim.cmd.colorscheme, id)
+        end
+      end
+
+      local function detect_os_bg()
         local env = (vim.env.NVIM_BG or ""):lower()
-        if env == "dark" or env == "light" then return env end
+        if env == "light" or env == "dark" then return env end
         if vim.fn.has("mac") == 1 then
           local out = vim.fn.systemlist([[defaults read -g AppleInterfaceStyle 2>/dev/null]])[1]
           return (out == "Dark") and "dark" or "light"
@@ -140,63 +164,36 @@ return {
         return (vim.o.background == "light") and "light" or "dark"
       end
 
-      -- apply a single colorscheme id (lilac-* or vanilla like "nord")
-      local function apply_one(id)
-        -- we keep a dark editing background so nothing falls back to "light" defaults
-        vim.o.background = "dark"
-        if id:match("^lilac%-") then
-          lilac.setup({
-            transparent = true,
-            integrations = { treesitter = true, telescope = true, gitsigns = true, lsp_trouble = true },
-          })
-          lilac.load(id)
-        else
-          pcall(vim.cmd.colorscheme, id)
-        end
-      end
-
-      -- apply a paired scheme based on detected bg
-      local function apply_pair()
-        local want = detect_os_appearance()
+      local function load_pair()
+        local want = detect_os_bg()
         local id = (want == "dark") and DEFAULT_PALETTES.dark or DEFAULT_PALETTES.light
-        -- reflect bg so schemes that key off &background behave
-        vim.o.background = want
-        if id:match("^lilac%-") then
-          lilac.setup({
-            transparent = true,
-            integrations = { treesitter = true, telescope = true, gitsigns = true, lsp_trouble = true },
-          })
-          lilac.load(id)
-        else
-          pcall(vim.cmd.colorscheme, id)
-        end
+        load_one(id, want)
       end
 
-      local SAME = (DEFAULT_PALETTES.light == DEFAULT_PALETTES.dark)
-      if SAME then
-        -- SINGLE THEME MODE: ignore macOS appearance and just use one theme
+      local SINGLE = (DEFAULT_PALETTES.light == DEFAULT_PALETTES.dark)
+
+      if SINGLE then
+        -- SINGLE THEME: ignore OS + NVIM_BG; pick a fixed bg for that theme
         local id = DEFAULT_PALETTES.dark
-        apply_one(id)
-        -- optional: simple helpers
+        local bg = fixed_bg_for_single(id)
+        load_one(id, bg)
+
+        -- Optional helper to change the single theme at runtime
         vim.api.nvim_create_user_command("LilacSame", function(opts)
-          local new = (opts.args ~= "" and opts.args) or id
+          local new = (opts.args or "") ~= "" and opts.args or id
           DEFAULT_PALETTES.light, DEFAULT_PALETTES.dark = new, new
-          apply_one(new)
+          load_one(new, fixed_bg_for_single(new))
         end, { nargs = "?" })
       else
-        -- PAIR MODE: track system appearance
-        apply_pair()
-        vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, { callback = apply_pair })
-        vim.api.nvim_create_user_command("LilacAuto",  apply_pair, {})
+        -- PAIR MODE: follow OS light/dark (or NVIM_BG)
+        load_pair()
+        vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, { callback = load_pair })
+        vim.api.nvim_create_user_command("LilacAuto",  load_pair, {})
         vim.api.nvim_create_user_command("LilacLight", function()
-          DEFAULT_PALETTES.light = DEFAULT_PALETTES.light or "lilac-pearlbloom"
-          vim.o.background = "light"
-          apply_one(DEFAULT_PALETTES.light)
+          load_one(DEFAULT_PALETTES.light, "light")
         end, {})
         vim.api.nvim_create_user_command("LilacDark",  function()
-          DEFAULT_PALETTES.dark = DEFAULT_PALETTES.dark or "lilac-nightbloom"
-          vim.o.background = "dark"
-          apply_one(DEFAULT_PALETTES.dark)
+          load_one(DEFAULT_PALETTES.dark, "dark")
         end, {})
       end
     end,
