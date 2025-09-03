@@ -1,56 +1,64 @@
 -- lua/suhail/lazy/colors.lua
---[[
-LILAC PAIRING (read me)
+-- Theme plugins + a single place to declare your pair.
+-- Transparency is configured INSIDE each theme, not in the switcher.
 
-Set your default light/dark palettes here. You can point both to the same ID
-to use a single look for light *and* dark. Example presets:
-  light = "lilac-pearlbloom",  dark = "lilac-nightbloom"       -- different
-  light = "lilac-mistbloom",   dark = "lilac-mistbloom"        -- same for both
-  light = "nord",              dark = "lilac-nightbloom"       -- mix external + Lilac
+---------------------------------------------------------------------
+-- 1) Declare the pair the switcher will use
+---------------------------------------------------------------------
+-- You can use either strings (colorscheme names) or tables:
+--   { theme = "<family>", variant = "<name>", opts = { ... } }
+--
+-- Examples (uncomment one and comment the others to try):
+--
+-- -- A) Single theme everywhere (legacy string)
+-- -- vim.g.theme_pairs = { light = "nord", dark = "nord" }
+--
+-- -- B) Single theme (Lilac variant)
+-- -- vim.g.theme_pairs = {
+-- --   light = { theme = "lilac", variant = "mistbloom" },
+-- --   dark  = { theme = "lilac", variant = "mistbloom" },
+-- -- }
+--
+-- -- C) Mix families: Lilac light, Catppuccin dark (with flavour)
+-- -- NOTE: because the switcher calls catppuccin.setup(flavour=...),
+-- --       include transparent_background in opts to keep transparency.
+-- -- vim.g.theme_pairs = {
+-- --   light = { theme = "lilac",      variant = "pearlbloom" },
+-- --   dark  = { theme = "catppuccin", variant = "mocha",
+-- --            opts = { transparent_background = true, term_colors = true } },
+-- -- }
+--
+-- -- D) Mix Tokyonight & Rose Pine by variant
+-- -- vim.g.theme_pairs = {
+-- --   light = { theme = "rose-pine",  variant = "dawn" },
+-- --   dark  = { theme = "tokyonight", variant = "moon" },
+-- -- }
+--
+-- Default (you can change this any time):
+vim.g.theme_pairs = vim.g.theme_pairs or { light = "nord", dark = "nord"}
 
-Runtime behavior:
-  • Background detection order:
-      1) NVIM_BG="light"|"dark" (handy over SSH)
-      2) macOS AppleInterfaceStyle (Dark → "dark", otherwise "light")
-      3) current :set background
-  • Optional per-session overrides (also nice over SSH):
-      NVIM_LILAC_LIGHT="<id>"  NVIM_LILAC_DARK="<id>"
-    If set, they replace the defaults below for this session only.
-
-Useful commands:
-  :Lilac <id>               → preview any Lilac palette immediately (e.g. lilac-nightbloom)
-  :LilacAuto                → re-run detection and load the paired palette
-  :LilacLight               → force-load DEFAULT_PALETTES.light
-  :LilacDark                → force-load DEFAULT_PALETTES.dark
-  :LilacPairStatus          → show current pair + active palette
-  :LilacPairSet {light} {dark}
-                            → set the pair for this session & apply current bg
-  :LilacSame {id}           → set both light/dark to one id (session only)
-]]
-
-local DEFAULT_PALETTES = {
-  -- choose any combination: "nord" or a Lilac id like "lilac-nightbloom"
-  light = "nord",
-  dark  = "nord",
-}
-
--- Optional per-session overrides via env (great over SSH)
+-- Optional env overrides for quick swaps (strings only)
 if vim.env.NVIM_LILAC_LIGHT and vim.env.NVIM_LILAC_LIGHT ~= "" then
-  DEFAULT_PALETTES.light = vim.env.NVIM_LILAC_LIGHT
+  vim.g.theme_pairs.light = vim.env.NVIM_LILAC_LIGHT
 end
 if vim.env.NVIM_LILAC_DARK and vim.env.NVIM_LILAC_DARK ~= "" then
-  DEFAULT_PALETTES.dark = vim.env.NVIM_LILAC_DARK
+  vim.g.theme_pairs.dark = vim.env.NVIM_LILAC_DARK
 end
 
+---------------------------------------------------------------------
+-- 2) Plugins (themes configure their OWN transparency here)
+---------------------------------------------------------------------
 return {
-  -- Optional alternatives kept lazy (unchanged)
+  -------------------------------------------------------------------
+  -- Tokyonight (transparent)
+  -------------------------------------------------------------------
   {
     "folke/tokyonight.nvim",
     name = "tokyonight",
     lazy = true,
     opts = {
-      style = "storm",
-      transparent = true,
+      style = "storm",          -- you can still load -night/-moon variants via switcher
+      transparent = true,       -- theme-owned transparency
       terminal_colors = true,
       styles = {
         comments = { italic = false },
@@ -60,12 +68,23 @@ return {
       },
     },
   },
+
+  -------------------------------------------------------------------
+  -- Rose Pine (transparent via disable_background)
+  -------------------------------------------------------------------
   {
     "rose-pine/neovim",
     name = "rose-pine",
     lazy = true,
-    opts = { disable_background = true },
+    opts = {
+      disable_background = true,   -- theme-owned transparency
+      -- You can still load "rose-pine-dawn" / "rose-pine-moon" via switcher
+    },
   },
+
+  -------------------------------------------------------------------
+  -- Xcode (left as-is; doesn’t force transparency)
+  -------------------------------------------------------------------
   {
     "arzg/vim-colors-xcode",
     name = "xcode",
@@ -95,106 +114,108 @@ return {
     end,
   },
 
-  ---------------------------------------------------------------------------
-  -- Nord: stock setup (transparency only). We don't apply the scheme here.
-  ---------------------------------------------------------------------------
+  -------------------------------------------------------------------
+  -- Nord (transparent via official globals) — theme-owned
+  -------------------------------------------------------------------
   {
     "nordtheme/vim",
     name = "nord",
-    lazy = false,          -- make sure it’s available before we might :colorscheme nord
+    lazy = false,
     priority = 1100,
-    -- For Vimscript colorschemes, set globals *before* applying the scheme.
     init = function()
-      -- keep the “transparent” feel you had before
-      vim.g.nord_disable_background = 1
-      -- tasteful defaults; tweak if you like
+      vim.g.nord_disable_background = 1   -- keep everything else transparent
       vim.g.nord_contrast = 1
       vim.g.nord_borders = 0
       vim.g.nord_italic = 0
       vim.g.nord_bold = 1
       vim.g.nord_uniform_diff_background = 1
-      -- truecolor helps Nord look right
       vim.opt.termguicolors = true
+    end,
+    config = function()
+      local function nord_polish()
+        if (vim.g.colors_name or "") ~= "nord" then return end
+
+        -- Keep most UI transparent (don’t touch statusline groups here)
+        local clear = {
+          "Normal","NormalNC","SignColumn","FoldColumn","EndOfBuffer",
+          "CursorLine","CursorColumn","WinSeparator",
+          "NormalFloat","FloatBorder","FloatTitle",
+          "Pmenu","PmenuSel","PmenuSbar","PmenuThumb",
+          "TelescopeNormal","TelescopeBorder",
+          "TelescopePromptNormal","TelescopePromptBorder",
+          "TelescopeResultsNormal","TelescopeResultsBorder",
+          "TelescopePreviewNormal","TelescopePreviewBorder",
+          "CmpDocumentation","CmpDocumentationBorder",
+        }
+        for _, g in ipairs(clear) do
+          pcall(vim.api.nvim_set_hl, 0, g, { bg = "NONE", ctermbg = "NONE" })
+        end
+
+        -- Palette pulls from terminal where possible
+        local ansi_black = vim.g.terminal_color_0  or "#000000"
+        local ansi_white = vim.g.terminal_color_15 or "#d8dee9"
+        local ansi_dim   = vim.g.terminal_color_8  or "#a3a7ad"  -- bright black
+
+        -- Your slightly brighter tone for comments + current line number
+        local dim = "#8f98aa"
+
+        -- Statusline (solid)
+        vim.api.nvim_set_hl(0, "StatusLine",   { bg = ansi_black, fg = dim })
+        vim.api.nvim_set_hl(0, "StatusLineNC", { bg = ansi_black, fg = ansi_dim })
+
+        -- Relative line numbers = ANSI 8
+        vim.api.nvim_set_hl(0, "LineNr",       { fg = dim, bg = "NONE" })
+        vim.api.nvim_set_hl(0, "LineNrAbove",  { fg = ansi_dim, bg = "NONE" })
+        vim.api.nvim_set_hl(0, "LineNrBelow",  { fg = ansi_dim, bg = "NONE" })
+
+        -- Current line number + comments = your custom dim hex
+        vim.api.nvim_set_hl(0, "Comment",      { fg = dim, bg = "NONE", italic = false })
+        pcall(vim.api.nvim_set_hl, 0, "@comment", { fg = dim, bg = "NONE", italic = false })
+      end
+
+      vim.api.nvim_create_autocmd("ColorScheme", { pattern = "nord", callback = nord_polish })
+      nord_polish()
+    end,  },
+  -------------------------------------------------------------------
+  -- Catppuccin (installed so you can select it directly)
+  -- IMPORTANT:
+  --  * If you pick Catppuccin with a VARIANT via the switcher, include
+  --    opts = { transparent_background = true } in your theme_pairs entry.
+  --    (The switcher calls catppuccin.setup({ flavour = ... }) in that case.)
+  --  * If you pick plain "catppuccin" (no variant), this config keeps it transparent.
+  -------------------------------------------------------------------
+  {
+    "catppuccin/nvim",
+    name = "catppuccin",
+    lazy = true,
+    config = function()
+      -- Default: transparent for the base "catppuccin" colorscheme.
+      -- When the switcher later calls setup(flavour=...), include opts in theme_pairs
+      -- to preserve transparency (see examples above).
+      require("catppuccin").setup({
+        transparent_background = true,
+        term_colors = true,
+        -- integrations can go here if you want them globally
+      })
     end,
   },
 
-  ---------------------------------------------------------------------------
-  -- Lilac: driver for lilac-* palettes + auto light/dark pairing
-  ---------------------------------------------------------------------------
+  -------------------------------------------------------------------
+  -- Lilac (your wrapper around Catppuccin; transparent by default)
+  -------------------------------------------------------------------
   {
     "suhailphotos/lilac",
     name = "lilac",
-    lazy = false,
-    priority = 1200,
-    dependencies = { "catppuccin/nvim" },
+    lazy = true,
     config = function()
-      local lilac = require("lilac")
-
-      local function is_lilac(id)
-        return type(id) == "string" and id:match("^lilac%-")
-      end
-
-      -- Single-theme: hard rule for bg (no OS/env checks).
-      -- Treat only pearlbloom as "light"; everything else as "dark".
-      local function fixed_bg_for_single(id)
-        if id == "lilac-pearlbloom" then return "light" end
-        return "dark"
-      end
-
-      local function load_one(id, bg)
-        vim.o.background = bg
-        if is_lilac(id) then
-          lilac.setup({
-            transparent = true,
-            integrations = { treesitter = true, telescope = true, gitsigns = true, lsp_trouble = true },
-          })
-          lilac.load(id)
-        else
-          pcall(vim.cmd.colorscheme, id)
-        end
-      end
-
-      local function detect_os_bg()
-        local env = (vim.env.NVIM_BG or ""):lower()
-        if env == "light" or env == "dark" then return env end
-        if vim.fn.has("mac") == 1 then
-          local out = vim.fn.systemlist([[defaults read -g AppleInterfaceStyle 2>/dev/null]])[1]
-          return (out == "Dark") and "dark" or "light"
-        end
-        return (vim.o.background == "light") and "light" or "dark"
-      end
-
-      local function load_pair()
-        local want = detect_os_bg()
-        local id = (want == "dark") and DEFAULT_PALETTES.dark or DEFAULT_PALETTES.light
-        load_one(id, want)
-      end
-
-      local SINGLE = (DEFAULT_PALETTES.light == DEFAULT_PALETTES.dark)
-
-      if SINGLE then
-        -- SINGLE THEME: ignore OS + NVIM_BG; pick a fixed bg for that theme
-        local id = DEFAULT_PALETTES.dark
-        local bg = fixed_bg_for_single(id)
-        load_one(id, bg)
-
-        -- Optional helper to change the single theme at runtime
-        vim.api.nvim_create_user_command("LilacSame", function(opts)
-          local new = (opts.args or "") ~= "" and opts.args or id
-          DEFAULT_PALETTES.light, DEFAULT_PALETTES.dark = new, new
-          load_one(new, fixed_bg_for_single(new))
-        end, { nargs = "?" })
-      else
-        -- PAIR MODE: follow OS light/dark (or NVIM_BG)
-        load_pair()
-        vim.api.nvim_create_autocmd({ "FocusGained", "VimResume" }, { callback = load_pair })
-        vim.api.nvim_create_user_command("LilacAuto",  load_pair, {})
-        vim.api.nvim_create_user_command("LilacLight", function()
-          load_one(DEFAULT_PALETTES.light, "light")
-        end, {})
-        vim.api.nvim_create_user_command("LilacDark",  function()
-          load_one(DEFAULT_PALETTES.dark, "dark")
-        end, {})
+      -- Your lilac/init.lua already defaults to transparent=true,
+      -- but setting it here keeps that intent explicit.
+      local ok, lilac = pcall(require, "lilac")
+      if ok and lilac.setup then
+        lilac.setup({
+          transparent = true,
+          integrations = { treesitter = true, telescope = true, gitsigns = true, lsp_trouble = true },
+        })
       end
     end,
   },

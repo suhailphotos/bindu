@@ -18,5 +18,8 @@ vim.opt.termguicolors = true
 -- load plugins first so the theme applies instantly
 require("suhail.lazy_init")
 
+-- Apply the theme once, theme-agnostic
+require("suhail.theme_switcher").apply()
+
 -- then the rest of your config
 require("suhail")
