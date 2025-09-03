@@ -43,10 +43,10 @@ window-padding-color = extend
 # Background (Acrylic)
 # ----------------------------------------
 # opacity is 0..1; macOS requires a full restart after changing this
-background-opacity = 0.97
+background-opacity = 0.95
 
 # integer blur strength; 20–35 gives a frosted look
-background-blur = 35
+background-blur = 60
 
 # ----------------------------------------
 # Titlebar
