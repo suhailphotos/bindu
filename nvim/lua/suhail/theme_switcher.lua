@@ -104,24 +104,33 @@ end
 
 -- --- Family applicators -----------------------------------------------------
 
+-- Lilac: honor spec.opts if provided (otherwise use plugin defaults)
 local function apply_lilac(spec)
   ensure_plugins_for("lilac")
   local ok, lilac = pcall(require, "lilac")
   if not ok then return end
+  if spec.opts and lilac.setup then
+    -- merge, but don't force anything besides what you pass
+    lilac.setup(vim.tbl_deep_extend("force", {}, spec.opts))
+  end
   local id = spec.id or (spec.variant and ("lilac-" .. spec.variant)) or "lilac-nightbloom"
-  -- Do NOT set transparency here; lilac’s own setup controls that.
   lilac.load(id)
 end
 
+-- Catppuccin: if you pass opts, we re-run setup once with your flavour+opts.
+-- If you don't pass opts, we just :colorscheme to preserve the plugin config.
 local function apply_catppuccin(spec)
   ensure_plugins_for("catppuccin")
   local flavour = spec.variant and tostring(spec.variant)
-  if flavour then
-    -- Use the variant-specific scheme; preserves plugin config (transparency)
-    local cs = "catppuccin-" .. flavour
-    if pcall(vim.cmd.colorscheme, cs) then return end
+  if spec.opts then
+    local ok, capp = pcall(require, "catppuccin")
+    if not ok then return end
+    local merged = vim.tbl_deep_extend("force", {}, spec.opts or {}, flavour and { flavour = flavour } or {})
+    capp.setup(merged)
   end
-  -- Fallback to base scheme if variant name isn't available
+  if flavour and pcall(vim.cmd.colorscheme, "catppuccin-" .. flavour) then
+    return
+  end
   pcall(vim.cmd.colorscheme, "catppuccin")
 end
 
