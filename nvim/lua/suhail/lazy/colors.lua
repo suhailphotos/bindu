@@ -162,6 +162,12 @@ return {
       local function nord_polish()
         if (vim.g.colors_name or "") ~= "nord" then return end
 
+        -- Accent overrides — your custom “greens” & “cyans”
+        local green        = "#a8d8e1"  -- new green
+        local green_bright = "#bae0e9"  -- bright green
+        local cyan         = "#bd9ae5"  -- new cyan
+        local cyan_bright  = "#b69ae5"  -- bright cyan
+
         -- Keep most UI transparent (IMPORTANT: do NOT clear PmenuSel)
         local clear = {
           "Normal","NormalNC","SignColumn","FoldColumn",
@@ -180,18 +186,39 @@ return {
           pcall(vim.api.nvim_set_hl, 0, g, { bg = "NONE", ctermbg = "NONE" })
         end
 
-        -- Statusline
+        -- 1) Syntax that’s green-ish in Nord (Strings, etc.)
+        vim.api.nvim_set_hl(0, "String",     { fg = green,        bg = "NONE" })
+        vim.api.nvim_set_hl(0, "Character",  { fg = green,        bg = "NONE" })
+        pcall(vim.api.nvim_set_hl, 0, "@string",                   { fg = green })
+        pcall(vim.api.nvim_set_hl, 0, "@string.documentation",     { fg = green })
+        pcall(vim.api.nvim_set_hl, 0, "@string.special",           { fg = green_bright })
+        pcall(vim.api.nvim_set_hl, 0, "@string.escape",            { fg = cyan_bright }) -- nice contrast for escapes/regex
+
+        -- 2) Places where a “bright green” reads well (adds, OK diag)
+        vim.api.nvim_set_hl(0, "DiffAdd",     { fg = green_bright, bg = "NONE", bold = true })
+        vim.api.nvim_set_hl(0, "GitSignsAdd", { fg = green_bright, bg = "NONE" })
+        -- Neovim 0.10+: DiagnosticOk exists; if not, it’s ignored
+        pcall(vim.api.nvim_set_hl, 0, "DiagnosticOk", { fg = green_bright })
+
+        -- 3) Cyan-ish buckets in Nord (specials/constants/hints)
+        vim.api.nvim_set_hl(0, "Special",           { fg = cyan,       bg = "NONE" })
+        vim.api.nvim_set_hl(0, "SpecialKey",        { fg = cyan,       bg = "NONE" })
+        pcall(vim.api.nvim_set_hl, 0, "@constant",          { fg = cyan })
+        pcall(vim.api.nvim_set_hl, 0, "@constant.builtin",  { fg = cyan_bright })
+        vim.api.nvim_set_hl(0, "DiagnosticHint",    { fg = cyan,       bg = "NONE" })
+
+        -- 4) Statusline
         vim.api.nvim_set_hl(0, "StatusLine",   { bg = ui.statusline_bg, fg = ui.statusline_fg })
         vim.api.nvim_set_hl(0, "StatusLineNC", { bg = ui.statusline_bg, fg = ui.statusline_nc_fg })
 
-        -- Rel. numbers & comments
+        -- 5) Rel. numbers & comments
         vim.api.nvim_set_hl(0, "LineNr",       { fg = ui.comment_fg, bg = "NONE" })
         vim.api.nvim_set_hl(0, "LineNrAbove",  { fg = ui.relnum_dim, bg = "NONE" })
         vim.api.nvim_set_hl(0, "LineNrBelow",  { fg = ui.relnum_dim, bg = "NONE" })
         vim.api.nvim_set_hl(0, "Comment",      { fg = ui.comment_fg, bg = "NONE", italic = false })
         pcall(vim.api.nvim_set_hl, 0, "@comment", { fg = ui.comment_fg, bg = "NONE", italic = false })
 
-        -- End-of-buffer tildes "~"
+        -- 6) End-of-buffer tildes "~"
         vim.api.nvim_set_hl(0, "EndOfBuffer", { fg = ui.eob_fg, bg = "NONE" })
 
         -- Completion menu selection (visible on transparent popups)
