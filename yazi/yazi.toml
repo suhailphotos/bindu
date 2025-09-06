@@ -1,3 +1,4 @@
+# ~/.config/yazi/yazi.toml
 [mgr]
 ratio = [1, 2, 3]
 sort_by = "natural"
@@ -11,3 +12,8 @@ max_width = 120
 max_height = 80
 tab_size = 2
 wrap = "yes"
+
+[opener]
+edit = [
+  { run = 'nvim "$@"', block = true, desc = "Neovim" }
+]
