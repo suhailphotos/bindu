@@ -1,0 +1,33 @@
+# Hide most of ~/Library, but keep CloudStorage (Dropbox/Synology)
+Library/**
+!Library/CloudStorage/**
+
+# Big top-level you never search
+Movies/**
+Music/**
+Pictures/**
+
+# Your custom noise
+Documents/nuke/**
+.local/pipx/**
+.zsh_sessions/**
+
+# Common dotdirs you rarely search
+.cache/**
+.npm/**
+.pyenv/**
+.venvs/**
+.Trash/**
+.dropbox/**
+
+# Dev/build noise anywhere
+**/.git/**
+**/node_modules/**
+**/__pycache__/**
+**/.venv/**
+**/venv/**
+**/.mypy_cache/**
+**/.pytest_cache/**
+
+# Misc
+**/.DS_Store
