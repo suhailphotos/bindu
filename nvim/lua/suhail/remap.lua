@@ -12,15 +12,6 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
--- optional: arrow-based with leader (nice on compact keyboards)
-vim.keymap.set("n", "<leader><Down>", "<C-f>zz", { desc = "Page down (center)" })
-vim.keymap.set("n", "<leader><Up>",   "<C-b>zz", { desc = "Page up (center)" })
-
--- optional: alt/meta-j/k for paging if your terminal sends Alt as Meta
--- (enable “Option sends Meta / Alt as Meta” in your terminal; in tmux: set -g xterm-keys on)
-vim.keymap.set("n", "<M-j>", "<C-f>zz", { desc = "Page down (center)" })
-vim.keymap.set("n", "<M-k>", "<C-b>zz", { desc = "Page up (center)" })
-
 -- clipboard/yank helpers
 vim.keymap.set({"n","v"}, "<leader>y", [["+y]])
 vim.keymap.set("n", "<leader>Y", [["+Y]])
