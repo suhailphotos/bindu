@@ -18,6 +18,10 @@ vim.keymap.set("n", "<leader>Y", [["+Y]])
 vim.keymap.set({"n","v"}, "<leader>d", [["_d]])
 vim.keymap.set("n", "Y", "yy")
 
+-- Page navigation
+vim.keymap.set("n", "<C-M-d>", "<C-f>zz", { desc = "Page down (center)", silent = true })
+vim.keymap.set("n", "<C-M-u>", "<C-b>zz", { desc = "Page up (center)",   silent = true })
+
 vim.keymap.set("x", "<leader>p", [["_dP]])  -- paste without clobbering
 vim.keymap.set("i", "<C-c>", "<Esc>")       -- controversial but handy
 
