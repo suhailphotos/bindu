@@ -1,3 +1,3 @@
 --hidden
 --smart-case
---ignore-file=$XDG_CONFIG_HOME/search/ignore
+--ignore-file=/Users/suhail/.config/search/ignore
