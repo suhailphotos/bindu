@@ -38,4 +38,7 @@ return {
 
   -- vim be good
   require("suhail.lazy.vim_be_good"),
+
+  -- Flash (motions/jumps)
+  require("suhail.lazy.flash"),
 }
