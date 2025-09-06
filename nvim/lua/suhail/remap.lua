@@ -12,11 +12,6 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
--- --- portable page scanning (no PageUp/Down needed) -------------------------
--- leader + Shift-J/K => page down/up centered
-vim.keymap.set("n", "<leader>J", "<C-f>zz", { desc = "Page down (center)" })
-vim.keymap.set("n", "<leader>K", "<C-b>zz", { desc = "Page up (center)" })
-
 -- optional: arrow-based with leader (nice on compact keyboards)
 vim.keymap.set("n", "<leader><Down>", "<C-f>zz", { desc = "Page down (center)" })
 vim.keymap.set("n", "<leader><Up>",   "<C-b>zz", { desc = "Page up (center)" })
