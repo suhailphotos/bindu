@@ -56,11 +56,17 @@ FreeBSD     = " "
 # Hostname (built-in, fast)
 # --------------------------
 [hostname]
-aliases = { "feather" = "" }
 disabled = false
+trim_at = "."
 ssh_only = false
 format = "[$hostname]($style) "
-style = "fg:host"
+style = "fg:dim"
+
+[hostname.aliases]
+feather = ""
+quasar  = "󰖨"
+nimbus  = ""
+eclipse = ""
 
 
 # ----------------------------
