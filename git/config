@@ -21,3 +21,5 @@
 
 [include]
   path = ~/.config/git/delta.gitconfig  # you already track this
+[status]
+	showUntrackedFiles = all
