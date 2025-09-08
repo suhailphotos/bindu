@@ -68,6 +68,18 @@ vim.keymap.set("n", "<leader>z", function()
   end
 end, { desc = "Toggle zoom current split" })
 
+-- close current buffer and open Telescope find_files
+vim.keymap.set("n", "<leader>nf", function()
+  vim.cmd("bd")
+  require("telescope.builtin").find_files()
+end, { desc = "New file (close current + Telescope)" })
+
+-- close current buffer and open Yazi
+vim.keymap.set("n", "<leader>nv", function()
+  vim.cmd("bd")
+  vim.cmd("Yazi") -- adjust if your Yazi command is different
+end, { desc = "New file (close current + Yazi)" })
+
 
 -- On-demand netrw (coexists cleanly with Yazi)
 vim.api.nvim_create_user_command("Netrw", function(opts)
