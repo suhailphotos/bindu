@@ -211,6 +211,8 @@ diverged    = '[·](fg:dim)[⇕](bold fg:git_diverged)[⇡](fg:git_ahead)[${ahea
 
 [git_branch]
 symbol = "·"
+truncation_length = 24
+truncation_symbol = '…'
 format = " [$symbol](fg:dim)[$branch]($style)"
 style = "italic fg:git_branch"
 
