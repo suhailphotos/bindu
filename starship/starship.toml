@@ -65,7 +65,7 @@ style = "fg:dim"
 [hostname.aliases]
 feather = ""
 quasar  = "󰖨"
-nimbus  = ""
+nimbus  = ""
 eclipse = ""
 flicker = ""
 nexus   = "󰴗"
@@ -138,6 +138,8 @@ error_symbol   = '[%](bold fg:err)'
 # --------------------
 [status]
 disabled = false
+pipestatus = true
+recognize_signal_code = true
 format = ' [${status}](fg:err) '              # ← trailing space
 
 # --------------------------------------------------
@@ -174,6 +176,9 @@ style              = "fg:dim"
 pyenv_version_name = false
 python_binary      = "python3"
 format             = ' [$symbol]($style) '
+detect_extensions = ['py', 'ipynb']
+detect_files = ['pyproject.toml', 'requirements.txt', 'setup.py', 'Pipfile', 'pyrightconfig.json']
+detect_folders = ['.venv', 'venv', '.pixi']
 
 # Conda env block; add trailing space at the end
 [conda]
