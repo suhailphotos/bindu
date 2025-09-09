@@ -1,4 +1,4 @@
-palette = 0=#202020
+palette = 0=#20232b
 palette = 1=#eb79ab
 palette = 2=#97d5e1
 palette = 3=#f7c09c
@@ -6,15 +6,15 @@ palette = 4=#8fc5f1
 palette = 5=#ea8fe1
 palette = 6=#b88ee7
 palette = 7=#a9abbc
-palette = 8=#949494
+palette = 8=#8d8f95
 palette = 9=#f493c6
 palette = 10=#97d0de
 palette = 11=#fcc9a7
 palette = 12=#a8d9ff
 palette = 13=#ffa6f8
 palette = 14=#bfa9f7
-palette = 15=#eeeff3
-background = #191919
-foreground = #ffffff
-cursor-color = #ffffff
+palette = 15=#e8e9ef
+background = #161920
+foreground = #ebeaf3
+cursor-color = #ebeaf3
 cursor-text = #ffffff
