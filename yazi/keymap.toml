@@ -4,9 +4,9 @@ on = ["<C-e>"]
 run = '''
 sh -c '
 if [ -n "$TMUX" ]; then
-  tmux split-window -v -c "#{pane_current_path}" "${EDITOR:-nvim} \"$@\""
+  tmux split-window -v -c "#{pane_current_path}" "${EDITOR:-vim}" "$@"
 else
-  ${EDITOR:-nvim} "$@"
+  "${EDITOR:-vim}" "$@"
 fi
 ' -- $yx
 '''

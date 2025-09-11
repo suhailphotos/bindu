@@ -15,5 +15,5 @@ wrap = "yes"
 
 [opener]
 edit = [
-  { run = 'nvim "$@"', block = true, desc = "Neovim" }
+  { run = """${EDITOR:-vim} "$@"""", block = true, desc = "Edit" }
 ]
