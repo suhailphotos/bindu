@@ -41,4 +41,7 @@ return {
 
   -- Flash (motions/jumps)
   require("suhail.lazy.flash"),
+
+  -- >>> New: Markdown renderer (on-demand)
+  require("suhail.lazy.markdown"),
 }
