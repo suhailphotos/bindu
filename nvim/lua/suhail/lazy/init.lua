@@ -1,4 +1,6 @@
--- one plugin list file; we’ll only load "mira" for now
+-- --------------------------------------------------
+-- Plugin List
+-- --------------------------------------------------
 return {
   require("suhail.lazy.colors"),
 }
