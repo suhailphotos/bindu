@@ -176,9 +176,10 @@ style              = "fg:dim"
 pyenv_version_name = false
 python_binary      = "python3"
 format             = ' [$symbol]($style) '
-detect_extensions = ['py', 'ipynb']
-detect_files = ['pyproject.toml', 'requirements.txt', 'setup.py', 'Pipfile', 'pyrightconfig.json']
-detect_folders = ['.venv', 'venv', '.pixi']
+# Only show when a virtual environment is active:
+detect_extensions = []
+detect_files      = []
+detect_folders    = []
 
 # Conda env block; add trailing space at the end
 [conda]
