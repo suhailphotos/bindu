@@ -7,9 +7,9 @@ packages = [
   "ffmpeg",
   "imagemagick",
   "poppler",
-  "p7zip",          # was 7zip
+  "p7zip",
   "openimageio",
-  "vips",           # was libvips
+  "libvips",
 ]
 
 [sets.macos]
