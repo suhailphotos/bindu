@@ -1,21 +1,29 @@
 [channels]
-# channels = ["conda-forge"]
+# explicit is fine (pixi defaults to conda-forge anyway)
+channels = ["conda-forge"]
 
 [sets.common]
 packages = [
   "ffmpeg",
   "imagemagick",
   "poppler",
-  "7zip",
+  "p7zip",          # was 7zip
   "openimageio",
-  "libvips",
+  "vips",           # was libvips
 ]
 
 [sets.macos]
-packages = ["pngpaste"]
+packages = [
+  # "pngpaste",     # leave to Homebrew on macOS; comment out here
+]
 
 [sets.linux]
-packages = ["xclip", "wl-clipboard"]
+packages = [
+  "xclip",
+  "wl-clipboard",
+]
 
 [hosts.nimbus]
-packages = ["cuda-toolkit"]
+packages = [
+  "cuda-toolkit",
+]
