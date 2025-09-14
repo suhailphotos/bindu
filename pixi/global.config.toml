@@ -1,0 +1,21 @@
+[channels]
+# channels = ["conda-forge"]
+
+[sets.common]
+packages = [
+  "ffmpeg",
+  "imagemagick",
+  "poppler",
+  "7zip",
+  "openimageio",
+  "libvips",
+]
+
+[sets.macos]
+packages = ["pngpaste"]
+
+[sets.linux]
+packages = ["xclip", "wl-clipboard"]
+
+[hosts.nimbus]
+packages = ["cuda-toolkit"]
