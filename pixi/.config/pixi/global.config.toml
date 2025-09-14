@@ -1,0 +1,35 @@
+# ~/.config/pixi/global.config.toml  (tracked in Bindu via stow)
+# This is YOUR schema (not Pixi’s). The helper script reads this and
+# calls `pixi global install` for the union of sets.
+
+[channels]
+# Optional extras (pixi already defaults to conda-forge)
+# channels = ["conda-forge"]
+
+[sets.common]
+packages = [
+  "ffmpeg",
+  "imagemagick",
+  "poppler",
+  "7zip",
+  "openimageio",
+  "libvips",
+]
+
+[sets.macos]
+packages = [
+  "pngpaste",
+]
+
+[sets.linux]
+packages = [
+  "xclip",
+  "wl-clipboard",
+]
+
+# Host-specific adds (short hostname)
+[hosts.nimbus]
+packages = [
+  "cuda-toolkit",    # example
+  # "cudnn",
+]

@@ -1,0 +1,63 @@
+#!/usr/bin/env python3
+import argparse, os, platform, subprocess, sys, shutil
+try:
+    import tomllib
+except ModuleNotFoundError:
+    import tomli as tomllib
+
+MANIFEST = os.path.expanduser("~/.config/pixi/global.config.toml")
+
+def die(msg, code=1):
+    print(f"[pixi-global-apply] {msg}", file=sys.stderr); sys.exit(code)
+
+def load_manifest(path):
+    try:
+        with open(path, "rb") as f:
+            return tomllib.load(f)
+    except FileNotFoundError:
+        die(f"manifest not found: {path}")
+    except Exception as e:
+        die(f"failed to parse {path}: {e}")
+
+def current_platform():
+    if sys.platform.startswith("darwin"): return "macos"
+    if sys.platform.startswith("linux"):  return "linux"
+    return "other"
+
+def union_packages(cfg):
+    pkgs, sets, hosts = set(), cfg.get("sets", {}), cfg.get("hosts", {})
+    pkgs.update(sets.get("common", {}).get("packages", []))
+    pkgs.update(sets.get(current_platform(), {}).get("packages", []))
+    pkgs.update(hosts.get(platform.node().split(".")[0], {}).get("packages", []))
+    return sorted(pkgs)
+
+def main():
+    ap = argparse.ArgumentParser(description="Apply global Pixi packages from a single manifest you track in Bindu.")
+    ap.add_argument("-f","--manifest", default=MANIFEST)
+    ap.add_argument("--dry-run", action="store_true")
+    ap.add_argument("--apply",   action="store_true")
+    args = ap.parse_args()
+
+    if shutil.which("pixi") is None:
+        die("pixi not found on PATH (expecting ~/.pixi/bin via Orbit/Homebrew).")
+
+    cfg = load_manifest(args.manifest)
+    pkgs = union_packages(cfg)
+    channels = cfg.get("channels", {}).get("channels", [])
+
+    print(f"manifest : {args.manifest}")
+    print(f"platform : {current_platform()}")
+    print(f"hostname : {platform.node().split('.')[0]}")
+    print(f"channels : {channels or '(default)'}")
+    print("packages :", ", ".join(pkgs) if pkgs else "(none)")
+
+    if not pkgs or (args.dry_run and not args.apply):
+        print("\n--dry-run only; nothing installed." if args.dry_run else "")
+        return
+
+    cmd = ["pixi", "global", "install", *sum((["-c", c] for c in channels), []), *pkgs]
+    print("\n$ " + " ".join(cmd))
+    subprocess.check_call(cmd)
+
+if __name__ == "__main__":
+    main()
