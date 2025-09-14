@@ -1,0 +1,30 @@
+version = 1
+
+[envs.ffmpeg]
+channels = ["conda-forge"]
+dependencies = { ffmpeg = "*" }
+exposed = { ffmpeg = "ffmpeg", ffplay = "ffplay", ffprobe = "ffprobe" }
+
+[envs.imagemagick]
+channels = ["conda-forge"]
+dependencies = { imagemagick = "*" }
+exposed = { "Magick++-config" = "Magick++-config", MagickCore-config = "MagickCore-config", MagickWand-config = "MagickWand-config", animate = "animate", compare = "compare", composite = "composite", conjure = "conjure", convert = "convert", display = "display", identify = "identify", import = "import", magick = "magick", magick-script = "magick-script", mogrify = "mogrify", montage = "montage", stream = "stream" }
+
+[envs.openimageio]
+channels = ["conda-forge"]
+dependencies = { openimageio = "*" }
+
+[envs.p7zip]
+channels = ["conda-forge"]
+dependencies = { p7zip = "*" }
+exposed = { 7z = "7z", 7za = "7za", 7zr = "7zr" }
+
+[envs.poppler]
+channels = ["conda-forge"]
+dependencies = { poppler = "*" }
+exposed = { pdfattach = "pdfattach", pdfdetach = "pdfdetach", pdffonts = "pdffonts", pdfimages = "pdfimages", pdfinfo = "pdfinfo", pdfseparate = "pdfseparate", pdfsig = "pdfsig", pdftocairo = "pdftocairo", pdftohtml = "pdftohtml", pdftoppm = "pdftoppm", pdftops = "pdftops", pdftotext = "pdftotext", pdfunite = "pdfunite" }
+
+[envs.libvips]
+channels = ["conda-forge"]
+dependencies = { libvips = "*" }
+exposed = { vips = "vips", vipsedit = "vipsedit", vipsheader = "vipsheader", vipsthumbnail = "vipsthumbnail" }
