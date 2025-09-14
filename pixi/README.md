@@ -42,7 +42,7 @@ On each machine you run Stow against **its own host folder** so that:
 
 1) **Install Pixi** without touching your shell rc (Orbit manages `$PATH`):
 ```bash
-PIXI_NO_PATH_UPDATE=1 curl -fsSL https://pixi.sh/install.sh | zsh
+curl -fsSL https://pixi.sh/install.sh | env PIXI_NO_PATH_UPDATE=1 bash
 ```
 Orbit (or your shell) must put `~/.pixi/bin` on PATH. A one‑off fallback is:
 ```bash
