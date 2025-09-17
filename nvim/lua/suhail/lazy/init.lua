@@ -2,6 +2,7 @@ return {
   -- Core libs
   { "nvim-lua/plenary.nvim", name = "plenary" },
   { "nvim-tree/nvim-web-devicons", opts = {} },
+  { "j-hui/fidget.nvim", event = "User LspOn", opts = {} },
   { "gpanders/editorconfig.nvim" },
 
   -- Colors
@@ -44,4 +45,6 @@ return {
 
   -- >>> New: Markdown renderer (on-demand)
   require("suhail.lazy.markdown"),
+
+
 }
