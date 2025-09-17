@@ -46,7 +46,7 @@ window-padding-color = extend
 background-opacity = 0.98
 
 # integer blur strength; 20–35 gives a frosted look
-background-blur = 60
+background-blur = 120
 
 # ----------------------------------------
 # Titlebar
