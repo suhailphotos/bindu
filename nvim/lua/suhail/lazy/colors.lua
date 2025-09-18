@@ -51,7 +51,8 @@ vim.g.theme_transparent = (vim.g.theme_transparent ~= false)
 ---------------------------------------------------------------------
 -- 1) Pair declaration (can be replaced anywhere before ThemeAuto)
 ---------------------------------------------------------------------
-vim.g.theme_pairs = vim.g.theme_pairs or { light = { theme = "lilac", variant = "pearlbloom" }, dark = { theme = "lilac", variant = "nightbloom" } }
+vim.g.theme_pairs = vim.g.theme_pairs or { light = { theme = "lilac", variant = "mistbloom" }, dark = { theme = "lilac", variant = "nightbloom" } }
+-- vim.g.theme_pairs = vim.g.theme_pairs or { light = { theme = "lilac", variant = "pearlbloom" }, dark = { theme = "lilac", variant = "nightbloom" } }
 
 -- Optional env overrides (strings only; helpful for SSH)
 if vim.env.NVIM_LILAC_LIGHT and vim.env.NVIM_LILAC_LIGHT ~= "" then
