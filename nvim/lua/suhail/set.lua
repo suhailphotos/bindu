@@ -4,6 +4,10 @@
 vim.opt.nu = true
 vim.opt.relativenumber = true
 
+-- highlight only the number on the cursor line (not the whole line)
+vim.opt.cursorline = true
+vim.opt.cursorlineopt = "number"
+
 vim.opt.tabstop = 2
 vim.opt.softtabstop = 2
 vim.opt.shiftwidth = 2
