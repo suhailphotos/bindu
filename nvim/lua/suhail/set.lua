@@ -1,4 +1,6 @@
+-- --------------------------------------------------
 -- Basics
+-- --------------------------------------------------
 vim.opt.nu = true
 vim.opt.relativenumber = true
 
@@ -12,7 +14,6 @@ vim.opt.wrap = false
 vim.opt.swapfile = false
 vim.opt.backup = false
 
--- vim.opt.undodir = (os.getenv("HOME") or "~") .. "/.vim/undodir"
 local undodir = vim.fn.expand("~/.vim/undodir")
 if vim.fn.isdirectory(undodir) == 0 then vim.fn.mkdir(undodir, "p") end
 vim.opt.undodir = undodir
@@ -20,12 +21,10 @@ vim.opt.undofile = true
 
 vim.opt.hlsearch = false
 vim.opt.incsearch = true
-vim.opt.termguicolors = true
 vim.opt.scrolloff = 8
 vim.opt.signcolumn = "yes"
 vim.opt.isfname:append("@-@")
 vim.opt.updatetime = 50
--- vim.opt.colorcolumn = "80"
 
 -- Misc niceties
 local augroup = vim.api.nvim_create_augroup

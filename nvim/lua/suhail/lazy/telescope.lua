@@ -1,14 +1,19 @@
+-- --------------------------------------------------
+-- Telescope
+-- --------------------------------------------------
 return {
   "nvim-telescope/telescope.nvim",
-  tag = "0.1.5",
+  version = false,
+  cmd = "Telescope",
   dependencies = { "nvim-lua/plenary.nvim" },
+  keys = {
+    { "<leader>pf", function() require("telescope.builtin").find_files() end, desc = "Files" },
+    { "<C-p>",      function() require("telescope.builtin").git_files()  end, desc = "Git Files" },
+    { "<leader>ps", function()
+        require("telescope.builtin").grep_string({ search = vim.fn.input("Grep > ") })
+      end, desc = "Grep (prompt)" },
+  },
   config = function()
     require("telescope").setup({})
-    local builtin = require("telescope.builtin")
-    vim.keymap.set("n", "<leader>pf", builtin.find_files, {})
-    vim.keymap.set("n", "<C-p>", builtin.git_files, {})
-    vim.keymap.set("n", "<leader>ps", function()
-      builtin.grep_string({ search = vim.fn.input("Grep > ") })
-    end)
   end,
 }
