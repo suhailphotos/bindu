@@ -1,7 +1,6 @@
 -- --------------------------------------------------
--- Leader & Basics
+-- Basics
 -- --------------------------------------------------
-vim.g.mapleader = " "
 
 -- move selected lines
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
