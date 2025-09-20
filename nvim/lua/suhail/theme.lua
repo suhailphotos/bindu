@@ -6,9 +6,9 @@ local M = {}
 -- Map of theme families → apply function
 M._families = {
   mira = function()
-    local ok, mira = pcall(require, "mira")
+    local ok, _ = pcall(require, "mira")
     if not ok then return false, "mira not installed" end
-    if mira.setup then mira.setup({ ansi_only = true }) end
+    vim.g.mira_ansi_only = true        -- <— set the global explicitly
     vim.opt.termguicolors = false
     pcall(vim.cmd.colorscheme, "mira")
     M.current = "mira"

@@ -17,4 +17,5 @@ require("lazy").setup({
   spec = "suhail.lazy",
   change_detection = { notify = false },
   install = { colorscheme = {} },
+  rocks = { enabled = false },
 })
