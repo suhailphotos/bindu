@@ -5,6 +5,12 @@ vim.g.mapleader = " "
 -- vim.opt.termguicolors = true
 
 -- --------------------------------------------------
+-- Providers such as npm (js), gen (ruby)
+-- --------------------------------------------------
+require("suhail.providers")
+
+
+-- --------------------------------------------------
 -- Bootstrap: lazy.nvim
 -- --------------------------------------------------
 require("suhail.lazy_init")
