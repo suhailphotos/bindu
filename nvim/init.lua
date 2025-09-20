@@ -10,6 +10,11 @@ vim.g.mapleader = " "
 require("suhail.lazy_init")
 
 -- --------------------------------------------------
+-- Python host resolver (fast, no imports at startup)
+--  --------------------------------------------------
+require("suhail.pythonhost").setup()
+
+-- --------------------------------------------------
 -- Keymaps (plugin-free)
 -- --------------------------------------------------
 require("suhail.remap")
