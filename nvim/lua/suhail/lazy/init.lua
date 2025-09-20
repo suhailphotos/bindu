@@ -8,4 +8,6 @@ return {
   require("suhail.lazy.yazi"),       -- file navigator
   require("suhail.lazy.treesitter"), -- treesitter
   require("suhail.lazy.clipboard"),  -- copy to clipboard over ssh
+  require("suhail.lazy.lsp"),        -- LSPs
+  require("suhail.lazy.cmd"),
 }
