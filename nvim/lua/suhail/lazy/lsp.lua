@@ -8,14 +8,13 @@ return {
   },
   config = function()
     local lspconfig = require("lspconfig")
-    local has = function(bin) return vim.fn.executable(bin) == 1 end
 
-    -- Prefer Pyright/BasedPyright, fallback to pylsp if neither is available.
-    local PY_SERVER = (has("pyright-langserver") and "pyright")
-                   or (has("basedpyright") and "basedpyright")
-                   or "pylsp"
+    -- Choose your Python LSP: "pyright" (default) or "basedpyright"
+    -- You can override per-host with: let g:py_server="basedpyright" or NVIM_PY_SERVER=basedpyright
+    local want = vim.g.py_server or vim.env.NVIM_PY_SERVER or "pyright"
+    local PY_SERVER = (want == "basedpyright") and "basedpyright" or "pyright"
 
-    -- Capabilities: upgrade if cmp is available; otherwise base caps.
+    -- Capabilities (upgrade if cmp is available)
     local base_caps = vim.lsp.protocol.make_client_capabilities()
     local capabilities = base_caps
     local ok, cmp_lsp = pcall(require, "cmp_nvim_lsp")
@@ -26,7 +25,7 @@ return {
     require("mason").setup()
     require("mason-lspconfig").setup({
       automatic_installation = false,
-      ensure_installed = { "ruff", PY_SERVER, "rust_analyzer" },
+      ensure_installed = { "ruff", PY_SERVER, "rust_analyzer" }, -- no pylsp here
       handlers = {
         -- Default handler: autostart OFF (use :LspOn)
         function(server)
@@ -36,7 +35,7 @@ return {
           })
         end,
 
-        -- Ruff (native, spawns `ruff server`): let Pyright own hovers
+        -- Ruff (runs `ruff server`); let Pyright/BasedPyright own hovers
         ["ruff"] = function()
           lspconfig.ruff.setup({
             capabilities = capabilities,
@@ -47,19 +46,19 @@ return {
           })
         end,
 
-        -- Pyright (light by default; Ruff handles imports/format)
+        -- Pyright
         ["pyright"] = function()
           lspconfig.pyright.setup({
             capabilities = capabilities,
             autostart = false,
             settings = {
               python = { analysis = { diagnosticMode = "openFilesOnly" } },
-              pyright = { disableOrganizeImports = true },
+              pyright = { disableOrganizeImports = true }, -- Ruff handles imports
             },
           })
         end,
 
-        -- BasedPyright variant
+        -- BasedPyright (if you opt into it)
         ["basedpyright"] = function()
           lspconfig.basedpyright.setup({
             capabilities = capabilities,
