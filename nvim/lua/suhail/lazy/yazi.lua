@@ -4,6 +4,7 @@
 return {
   "mikavilpas/yazi.nvim",
   version = "*",
+  cond = function() return vim.fn.executable("yazi") == 1 end, -- <— only load if available
   event = "VeryLazy",
   dependencies = { "nvim-lua/plenary.nvim" },
   keys = {
@@ -19,8 +20,14 @@ return {
     yazi_floating_window_winblend = 0,
     highlight_hovered_buffers_in_same_directory = true,
     integrations = {
-      resolve_relative_path_application =
-        (vim.loop.os_uname().sysname == "Darwin") and "grealpath" or "realpath",
+      resolve_relative_path_application = (function()
+        local sys = vim.loop.os_uname().sysname
+        if sys == "Darwin" then
+          if vim.fn.executable("grealpath") == 1 then return "grealpath" end
+          return "realpath"
+        end
+        return "realpath"
+      end)(),
     },
     open_file_function = function(chosen_file)
       if type(chosen_file) == "string" and vim.fn.isdirectory(chosen_file) == 1 then

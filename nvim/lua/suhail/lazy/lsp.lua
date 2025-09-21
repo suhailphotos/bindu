@@ -8,9 +8,9 @@ return {
   },
   config = function()
     local lspconfig = require("lspconfig")
+    local function has(bin) return vim.fn.executable(bin) == 1 end
 
     -- Choose your Python LSP: "pyright" (default) or "basedpyright"
-    -- You can override per-host with: let g:py_server="basedpyright" or NVIM_PY_SERVER=basedpyright
     local want = vim.g.py_server or vim.env.NVIM_PY_SERVER or "pyright"
     local PY_SERVER = (want == "basedpyright") and "basedpyright" or "pyright"
 
@@ -91,14 +91,38 @@ return {
       end,
     })
 
+    -- Map servers -> binaries for preflight checks
+    local bin_for = {
+      ruff = "ruff",
+      pyright = "pyright-langserver",
+      basedpyright = "basedpyright",
+      rust_analyzer = "rust-analyzer",
+    }
+
     vim.api.nvim_create_user_command("LspOn", function(opts)
       vim.g.lsp_muted = false
       vim.diagnostic.enable(true, { bufnr = 0 })
+
+      local wanted = {}
       if opts.args ~= "" then
-        vim.cmd("LspStart " .. opts.args)      -- e.g. :LspOn ruff | :LspOn pyright
+        table.insert(wanted, opts.args)
       else
-        pcall(vim.api.nvim_exec_autocmds, "User", { pattern = "LspOn" })
-        vim.cmd("LspStart")
+        wanted = { "ruff", PY_SERVER, "rust_analyzer" }
+      end
+
+      local started = 0
+      for _, srv in ipairs(wanted) do
+        local bin = bin_for[srv]
+        if (not bin) or has(bin) then
+          local ok2 = pcall(vim.cmd, "LspStart " .. srv)
+          if ok2 then started = started + 1 end
+        else
+          vim.notify(("Skipping %s (missing %s)"):format(srv, bin), vim.log.levels.INFO)
+        end
+      end
+
+      if started == 0 then
+        vim.notify("No LSP servers started (none installed).", vim.log.levels.WARN)
       end
     end, { nargs = "?" })
 

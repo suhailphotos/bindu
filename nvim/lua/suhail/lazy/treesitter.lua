@@ -1,4 +1,6 @@
+-- --------------------------------------------------
 -- lua/suhail/lazy/treesitter.lua
+-- --------------------------------------------------
 return {
   "nvim-treesitter/nvim-treesitter",
   build = ":TSUpdate",
@@ -8,7 +10,7 @@ return {
       "vimdoc", "vim", "lua", "bash",
       -- web
       "javascript", "typescript", "json", "yaml", "toml",
-      -- langs you asked for
+      -- langs I use
       "python", "rust", "c",
       -- docs
       "markdown", "markdown_inline",
@@ -16,7 +18,7 @@ return {
       "dockerfile", "gitignore", "tmux",
     },
     sync_install = false,
-    auto_install = true,  -- set false if you don’t want auto-download on servers
+    auto_install = false,  -- <— no background downloads. Turn on if you want auto download
     highlight = { enable = true, additional_vim_regex_highlighting = { "markdown" } },
     indent = { enable = true },
   },

@@ -1,7 +1,7 @@
 local M = {}
 
-local LIMIT_BYTES = 1 * 1024 * 1024  -- 1MB; tune to taste
-local LIMIT_LINES = 10000            -- or line-based cut-off
+local LIMIT_BYTES = 1 * 1024 * 1024  -- 1MB
+local LIMIT_LINES = 10000
 
 local function is_big(buf)
   local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
@@ -16,20 +16,24 @@ function M.setup()
       local b = args.buf
       if not is_big(b) then return end
 
-      -- Disable expensive stuff for this buffer
-      vim.b.bigfile = true
-      pcall(function() require("nvim-treesitter.configs").setup({ highlight = { enable = false }, indent = { enable = false } }) end)
-      vim.cmd("syntax off")
+      vim.b[b].bigfile = true
 
-      -- If you had LSP on, turn it off for this buffer:
+      -- Stop Treesitter for this buffer only
+      pcall(function() vim.treesitter.stop(b) end)
+
+      -- Turn off classic syntax too
+      vim.bo[b].syntax = "off"
+
+      -- LSP off just for this buffer (if currently on)
       if not vim.g.lsp_muted then
         for _, c in ipairs(vim.lsp.get_clients({ bufnr = b })) do c.stop(true) end
       end
 
-      -- Helpful UI tweaks
-      vim.bo.swapfile = false
-      vim.bo.undofile = false
-      vim.opt_local.foldmethod = "manual"
+      -- Lightweight buffer opts
+      vim.bo[b].swapfile = false
+      vim.bo[b].undofile = false
+      vim.bo[b].indentexpr = ""
+      vim.wo.foldmethod = "manual"
     end,
   })
 end
