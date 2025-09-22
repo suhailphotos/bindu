@@ -101,11 +101,8 @@ window-height = 42
 # Themes
 # ----------------------------------------
 # active theme (dark/light pair)
-# theme = dark:lilac-mistbloom,light:lilac-mistbloom
-# theme = dark:lilac-nightbloom,light:lilac-pearlbloom
 theme = dark:lilac-nightbloom,light:lilac-pearlbloom
 
 # quick switches
-# theme = dark:catppuccin-mocha,light:catppuccin-mocha
-# theme = dark:rose-pine,light:xcodelighthc
-# theme = dark:catppuccin-mocha-strong,light:catppuccin-mocha-latte
+# theme = dark:lilac-mistbloom,light:lilac-pearlbloom
+
