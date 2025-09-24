@@ -1,44 +1,37 @@
--- --------------------------------------------------
--- Core
--- --------------------------------------------------
+vim.g.base46_cache = vim.fn.stdpath "data" .. "/base46/"
 vim.g.mapleader = " "
-if vim.loader and vim.loader.enable then vim.loader.enable() end
--- vim.opt.timeoutlen  = 300  -- default 1000; faster mapped-key sequences
--- vim.opt.ttimeoutlen = 10   -- faster keycode timeout
 
+-- bootstrap lazy and all plugins
+local lazypath = vim.fn.stdpath "data" .. "/lazy/lazy.nvim"
 
--- --------------------------------------------------
--- Providers such as npm (js), gen (ruby)
--- --------------------------------------------------
-require("suhail.providers")
+if not vim.uv.fs_stat(lazypath) then
+  local repo = "https://github.com/folke/lazy.nvim.git"
+  vim.fn.system { "git", "clone", "--filter=blob:none", repo, "--branch=stable", lazypath }
+end
 
+vim.opt.rtp:prepend(lazypath)
 
--- --------------------------------------------------
--- Bootstrap: lazy.nvim
--- --------------------------------------------------
-require("suhail.lazy_init")
+local lazy_config = require "configs.lazy"
 
--- --------------------------------------------------
--- Python host resolver (fast, no imports at startup)
---  --------------------------------------------------
-require("suhail.pythonhost").setup()
+-- load plugins
+require("lazy").setup({
+  {
+    "NvChad/NvChad",
+    lazy = false,
+    branch = "v2.5",
+    import = "nvchad.plugins",
+  },
 
--- --------------------------------------------------
--- Keymaps (plugin-free)
--- --------------------------------------------------
-require("suhail.remap")
+  { import = "plugins" },
+}, lazy_config)
 
--- --------------------------------------------------
--- Neovim Options
--- --------------------------------------------------
-require("suhail.set")
+-- load theme
+dofile(vim.g.base46_cache .. "defaults")
+dofile(vim.g.base46_cache .. "statusline")
 
--- --------------------------------------------------
--- Performance optimization
--- --------------------------------------------------
-require("suhail.bigfile").setup()
+require "options"
+require "autocmds"
 
--- --------------------------------------------------
--- Theme (default = Mira / ANSI)
--- --------------------------------------------------
-require("suhail.theme").apply_default()
+vim.schedule(function()
+  require "mappings"
+end)
