@@ -37,5 +37,8 @@ return {
   },
   config = function()
     require("telescope").setup({})
+     pcall(function()
+      require("suhail.lazy.grepkeymap").setup()
+    end)
   end,
 }
