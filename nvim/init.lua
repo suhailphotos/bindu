@@ -42,3 +42,6 @@ require("suhail.bigfile").setup()
 -- Theme (default = Mira / ANSI)
 -- --------------------------------------------------
 require("suhail.theme").apply_default()
+
+-- Practice commands (lazy loads hardtime/vim-be-good on demand)
+require("suhail.practice")

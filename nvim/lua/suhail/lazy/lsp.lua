@@ -2,239 +2,103 @@
 return {
   "neovim/nvim-lspconfig",
   dependencies = {
-    "williamboman/mason.nvim",
-    "williamboman/mason-lspconfig.nvim",
-    -- NOTE: no cmp-nvim-lsp here; cmp.lua will bring it
+    { "mason-org/mason.nvim",           opts = {} },
+    { "mason-org/mason-lspconfig.nvim", opts = { ensure_installed = { "pyright", "ruff", "rust_analyzer", "lua_ls" } } },
   },
   config = function()
-    local lspconfig = require("lspconfig")
-    local function has(bin) return vim.fn.executable(bin) == 1 end
-
-    -- Choose your Python LSP: "pyright" (default) or "basedpyright"
-    local want = vim.g.py_server or vim.env.NVIM_PY_SERVER or "pyright"
-    local PY_SERVER = (want == "basedpyright") and "basedpyright" or "pyright"
-
-    -- Capabilities (upgrade if cmp is available)
-    local base_caps = vim.lsp.protocol.make_client_capabilities()
-    local capabilities = base_caps
+    -- Capabilities (nvim-cmp integration)
+    local caps = vim.lsp.protocol.make_client_capabilities()
     local ok, cmp_lsp = pcall(require, "cmp_nvim_lsp")
     if ok and cmp_lsp and cmp_lsp.default_capabilities then
-      capabilities = cmp_lsp.default_capabilities(base_caps)
+      caps = cmp_lsp.default_capabilities(caps)
     end
 
-    require("mason").setup()
-    require("mason-lspconfig").setup({
-      automatic_installation = false,
-      ensure_installed = { "ruff", PY_SERVER, "rust_analyzer" }, -- no pylsp here
-      handlers = {
-        -- Default handler: autostart OFF (use :LspOn or on-demand keys)
-        function(server)
-          lspconfig[server].setup({
-            capabilities = capabilities,
-            autostart = false,
-          })
-        end,
+    -- Buffer-local keymaps when a server attaches (explicit so K always works)
+    local function on_attach(_, bufnr)
+      local function map(mode, lhs, rhs, desc)
+        vim.keymap.set(mode, lhs, rhs, { buffer = bufnr, silent = true, desc = desc })
+      end
+      map("n", "K",  vim.lsp.buf.hover,           "LSP Hover")
+      map("i", "<C-k>", vim.lsp.buf.signature_help, "Signature Help")
+      map("n", "gd", vim.lsp.buf.definition,      "Go to Definition")
+      map("n", "gD", vim.lsp.buf.declaration,     "Go to Declaration")
+      map("n", "gi", vim.lsp.buf.implementation,  "Go to Implementation")
+      map("n", "gr", vim.lsp.buf.references,      "References")
+      map("n", "<leader>rn", vim.lsp.buf.rename,  "Rename Symbol")
+      map("n", "<leader>ca", vim.lsp.buf.code_action, "Code Action")
+    end
 
-        -- Ruff (runs `ruff server`); let Pyright/BasedPyright own hovers
-        ["ruff"] = function()
-          lspconfig.ruff.setup({
-            capabilities = capabilities,
-            autostart = false,
-            on_attach = function(client, _)
-              client.server_capabilities.hoverProvider = false
-            end,
-          })
-        end,
+    -- Apply defaults to all servers
+    vim.lsp.config("*", {
+      capabilities = caps,
+      on_attach = on_attach,
+    })
 
-        -- Pyright
-        ["pyright"] = function()
-          lspconfig.pyright.setup({
-            capabilities = capabilities,
-            autostart = false,
-            settings = {
-              python = { analysis = { diagnosticMode = "openFilesOnly" } },
-              pyright = { disableOrganizeImports = true }, -- Ruff handles imports
-            },
-          })
-        end,
-
-        -- BasedPyright (if you opt into it)
-        ["basedpyright"] = function()
-          lspconfig.basedpyright.setup({
-            capabilities = capabilities,
-            autostart = false,
-            settings = {
-              basedpyright = { disableOrganizeImports = true },
-              python = { analysis = { diagnosticMode = "openFilesOnly" } },
-            },
-          })
-        end,
+    -- Lua: teach the server about the global `vim`
+    vim.lsp.config("lua_ls", {
+      settings = {
+        Lua = {
+          diagnostics = { globals = { "vim" } },
+          workspace   = { library = vim.api.nvim_get_runtime_file("", true), checkThirdParty = false },
+          telemetry   = { enable = false },
+        },
       },
     })
 
-    --------------------------------------------------------------------------
-    -- LSP toggles (opt-in workflow)
-    --------------------------------------------------------------------------
-    vim.g.lsp_muted = true
-
-    local function stop_clients(bufnr, name)
-      bufnr = bufnr or 0
-      local list = (vim.lsp.get_clients and vim.lsp.get_clients({ bufnr = bufnr, name = name })) or {}
-      for _, c in ipairs(list) do c.stop(true) end
-    end
-
-    -- One-shot allow flag to attach just for a single requested action
-    vim.api.nvim_create_autocmd("LspAttach", {
-      callback = function(args)
-        local bufnr = args.buf
-        -- If muted AND not explicitly allowed for this one action, stop.
-        if vim.g.lsp_muted and not vim.b[bufnr]._lsp_allow_once then
-          local client = vim.lsp.get_client_by_id(args.data.client_id)
-          if client then vim.schedule(function() client.stop(true) end) end
-        end
-        -- Clear the one-shot flag after attach
-        vim.b[bufnr]._lsp_allow_once = nil
+    -- Ruff: let Pyright/Rust own hover docs
+    vim.lsp.config("ruff", {
+      on_attach = function(client, bufnr)
+        client.server_capabilities.hoverProvider = false
+        on_attach(client, bufnr)
       end,
     })
 
-    -- Map servers -> binaries for preflight checks
-    local bin_for = {
-      ruff = "ruff",
-      pyright = "pyright-langserver",
-      basedpyright = "basedpyright",
-      rust_analyzer = "rust-analyzer",
-    }
+    -- Enable servers (autostart on matching filetypes)
+    vim.lsp.enable("pyright")
+    vim.lsp.enable("ruff")
+    vim.lsp.enable("rust_analyzer")
+    vim.lsp.enable("lua_ls")
 
-    vim.api.nvim_create_user_command("LspOn", function(opts)
-      vim.g.lsp_muted = false
-      vim.diagnostic.enable(true, { bufnr = 0 })
-
-      local wanted = {}
-      if opts.args ~= "" then
-        table.insert(wanted, opts.args)
-      else
-        wanted = { "ruff", PY_SERVER, "rust_analyzer" }
-      end
-
-      local started = 0
-      for _, srv in ipairs(wanted) do
-        local bin = bin_for[srv]
-        if (not bin) or has(bin) then
-          local ok2 = pcall(vim.cmd, "LspStart " .. srv)
-          if ok2 then started = started + 1 end
-        else
-          vim.notify(("Skipping %s (missing %s)"):format(srv, bin), vim.log.levels.INFO)
-        end
-      end
-
-      if started == 0 then
-        vim.notify("No LSP servers started (none installed).", vim.log.levels.WARN)
-      end
-    end, { nargs = "?" })
-
-    vim.api.nvim_create_user_command("LspOff", function()
-      vim.g.lsp_muted = true
-      vim.diagnostic.enable(false)
-      for _, b in ipairs(vim.api.nvim_list_bufs()) do
-        if vim.api.nvim_buf_is_loaded(b) then stop_clients(b) end
-      end
-    end, {})
-
-    --------------------------------------------------------------------------
-    -- (2) On-demand LSP: start server only when you invoke an LSP action
-    --------------------------------------------------------------------------
-    local function ensure_lsp_then(bufnr, action)
-      bufnr = bufnr or 0
-      -- Already attached? Just do it.
-      if #vim.lsp.get_clients({ bufnr = bufnr }) > 0 then
-        action()
-        return
-      end
-      -- Allow a one-time attach for this buffer
-      vim.b._lsp_allow_once = true
-      -- Run the action once the server attaches
-      vim.api.nvim_create_autocmd("LspAttach", {
-        buffer = bufnr,
-        once = true,
-        callback = function()
-          action()
-        end,
-      })
-      -- Start any configured servers that match this buffer's filetype
-      vim.cmd("LspStart")
-    end
-
-    -- Keymap helpers
-    local function nmap(lhs, fn, desc)
-      vim.keymap.set("n", lhs, fn, { silent = true, desc = desc })
-    end
-    local function imap(lhs, fn, desc)
-      vim.keymap.set("i", lhs, fn, { silent = true, desc = desc })
-    end
-
-    -- Quiet-by-default keymaps that wake LSP only when pressed
-    nmap("K",  function() ensure_lsp_then(0, vim.lsp.buf.hover) end,               "LSP Hover")
-    nmap("gd", function() ensure_lsp_then(0, vim.lsp.buf.definition) end,          "LSP Definition")
-    nmap("gD", function() ensure_lsp_then(0, vim.lsp.buf.declaration) end,         "LSP Declaration")
-    nmap("gT", function() ensure_lsp_then(0, vim.lsp.buf.type_definition) end,     "LSP Type Def")
-    nmap("gi", function() ensure_lsp_then(0, vim.lsp.buf.implementation) end,      "LSP Impl")
-    nmap("gr", function() ensure_lsp_then(0, vim.lsp.buf.references) end,          "LSP Refs")
-    nmap("<leader>rn", function() ensure_lsp_then(0, vim.lsp.buf.rename) end,      "LSP Rename")
-    nmap("<leader>ca", function() ensure_lsp_then(0, vim.lsp.buf.code_action) end, "LSP Code Action")
-    imap("<C-k>", function() ensure_lsp_then(0, vim.lsp.buf.signature_help) end,   "Signature help")
-
-    --------------------------------------------------------------------------
-    -- Optional: diagnostics stay hidden unless you toggle them
-    --------------------------------------------------------------------------
-    vim.g._diag_on = false
-    vim.diagnostic.config({
-      virtual_text = false,
-      signs = false,
-      underline = false,
-      update_in_insert = false,
+    -- Nicer hover window, still minimal
+    vim.lsp.handlers["textDocument/hover"] = vim.lsp.with(vim.lsp.handlers.hover, {
+      border = "rounded",
+      max_width = 88,
+      max_height = 24,
+      focusable = true,
     })
-    vim.api.nvim_create_user_command("DiagToggle", function()
-      vim.g._diag_on = not vim.g._diag_on
+
+    --------------------------------------------------------------------------
+    -- Diagnostics: QUIET by default + simple controls
+    --------------------------------------------------------------------------
+    local function set_diag(on)
       vim.diagnostic.config({
-        virtual_text = vim.g._diag_on,
-        signs = vim.g._diag_on,
-        underline = vim.g._diag_on,
+        virtual_text = on or false,
+        signs        = on or false,
+        underline    = on or false,
+        update_in_insert = false,
+        float = { border = "rounded", source = "if_many" },
       })
-      print("Diagnostics " .. (vim.g._diag_on and "ON" or "OFF"))
-    end, {})
+    end
 
-    --------------------------------------------------------------------------
-    -- Optional: Hover on hold (off by default). Clean, no spam.
-    --------------------------------------------------------------------------
-    local hover_aucmd
-    vim.api.nvim_create_user_command("HoverAutoOn", function()
-      if hover_aucmd then return end
-      hover_aucmd = vim.api.nvim_create_autocmd("CursorHold", {
-        callback = function()
-          ensure_lsp_then(0, function()
-            vim.lsp.buf.hover()
-          end)
-        end,
-      })
-      print("Hover-on-hold ON")
-    end, {})
-    vim.api.nvim_create_user_command("HoverAutoOff", function()
-      if hover_aucmd then vim.api.nvim_del_autocmd(hover_aucmd); hover_aucmd = nil end
-      print("Hover-on-hold OFF")
-    end, {})
+    set_diag(false)  -- default OFF
 
-    --------------------------------------------------------------------------
-    -- (3) Ephemeral mode: stop clients on BufLeave when muted (opt-in)
-    --------------------------------------------------------------------------
-    vim.g.lsp_ephemeral = false  -- set to true in a session to enable
-    vim.api.nvim_create_autocmd("BufLeave", {
-      callback = function(args)
-        if not vim.g.lsp_muted or not vim.g.lsp_ephemeral then return end
-        local bufnr = args.buf
-        for _, c in ipairs(vim.lsp.get_clients({ bufnr = bufnr })) do
-          c.stop(true)
-        end
-      end,
-    })
+    vim.api.nvim_create_user_command("DiagOn",     function() set_diag(true)  print("Diagnostics ON")  end, {})
+    vim.api.nvim_create_user_command("DiagOff",    function() set_diag(false) print("Diagnostics OFF") end, {})
+    vim.api.nvim_create_user_command("DiagToggle", function()
+      local cfg = vim.diagnostic.config()
+      local on = not (cfg.virtual_text or cfg.signs or cfg.underline)
+      set_diag(on)
+      print("Diagnostics " .. (on and "ON" or "OFF"))
+    end, {})
+    -- Keymaps for diagnostics control (global)
+    vim.keymap.set("n", "<leader>lt", "<cmd>DiagToggle<CR>", { desc = "Diagnostics: Toggle", silent = true })
+    vim.keymap.set("n", "<leader>l1", "<cmd>DiagOn<CR>",     { desc = "Diagnostics: On",     silent = true })
+    vim.keymap.set("n", "<leader>l0", "<cmd>DiagOff<CR>",    { desc = "Diagnostics: Off",    silent = true })
+    vim.keymap.set("n", "<leader>lh", "<cmd>DiagHere<CR>",   { desc = "Diagnostics: Here",   silent = true })
+
+    -- Peek diagnostics at cursor without turning them on
+    vim.api.nvim_create_user_command("DiagHere", function()
+      vim.diagnostic.open_float(0, { scope = "cursor", border = "rounded", focusable = true })
+    end, {})
   end,
 }

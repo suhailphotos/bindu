@@ -10,4 +10,8 @@ return {
   require("suhail.lazy.clipboard"),  -- copy to clipboard over ssh
   require("suhail.lazy.lsp"),        -- LSPs
   require("suhail.lazy.cmd"),
+  require("suhail.lazy.markdown"),
+  require("suhail.lazy.undotree"),
+  require("suhail.lazy.fugitive"),
+  require("suhail.lazy.vim_be_good"),
 }
