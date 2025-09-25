@@ -1,7 +1,6 @@
 return {
   {
-    -- use local path while the repo is private; switch to "suhailphotos/iris" later
-    dir = vim.fn.expand("~/Library/CloudStorage/Dropbox/matrix/iris"),
+    "suhailphotos/iris",
     name = "iris",
     lazy = false,         -- apply theme at startup
     priority = 1000,      -- win the colorscheme race
@@ -10,6 +9,8 @@ return {
       { "suhailphotos/mira",  name = "mira" },
       { "nordtheme/vim",      name = "nord" },
       { "rose-pine/neovim",   name = "rose-pine" },
+      { "catppuccin/nvim",     name = "catppuccin" },
+      { "folke/tokyonight.nvim", name = "tokyonight" },
     },
     opts = {
       default = vim.g.theme_default or vim.env.NVIM_THEME or "mira",
