@@ -1,5 +1,6 @@
 **/.DS_Store
 nvim/lazy-lock.json
+nvim/lua/chadrc.lua
 op/
 fontforge/
 iterm2/
