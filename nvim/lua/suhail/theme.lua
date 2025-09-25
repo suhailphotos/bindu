@@ -79,4 +79,12 @@ if vim.g.theme_enable_keymaps ~= false then
   register_keymaps()
 end
 
+-- List all theme names you defined in M._families
+function M.list()
+  local names = {}
+  for k, _ in pairs(M._families) do table.insert(names, k) end
+  table.sort(names)
+  return names
+end
+
 return M
