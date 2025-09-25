@@ -15,7 +15,12 @@ return {
   {
     "nordtheme/vim",
     name = "nord",
-    lazy = true,       -- only loads when we :colorscheme nord
+    lazy = false,       -- only loads when we :colorscheme nord
+  },
+
+  { "rose-pine/neovim",
+    name = "rose-pine",
+    lazy = false
   },
 
   -- add catppuccin/tokyonight later if you want

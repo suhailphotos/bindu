@@ -38,11 +38,3 @@ vim.keymap.set("n", "<leader>z", function()
   end
 end)
 
--- in lua/suhail/remap.lua (or wherever you keep keys)
-vim.keymap.set("n", "<leader>ts", function() require("suhail.theme_picker").open() end,
-  { desc = "Theme: search & switch" })
-
--- and/or a command
-vim.api.nvim_create_user_command("ThemePick", function()
-  require("suhail.theme_picker").open()
-end, {})

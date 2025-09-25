@@ -6,9 +6,8 @@ local M = {}
 -- Map of theme families → apply function
 M._families = {
   mira = function()
-    local ok, _ = pcall(require, "mira")
-    if not ok then return false, "mira not installed" end
-    vim.g.mira_ansi_only = true        -- <— set the global explicitly
+    local ok = pcall(require, "mira"); if not ok then return false, "mira not installed" end
+    vim.g.mira_ansi_only = true
     vim.opt.termguicolors = false
     pcall(vim.cmd.colorscheme, "mira")
     M.current = "mira"
@@ -22,7 +21,20 @@ M._families = {
     return true
   end,
 
-  -- add more families later (catppuccin, tokyonight, etc.)
+  ["rose-pine"] = function()
+    -- Ensure plugin is loaded and reset its variant
+    local ok, rp = pcall(require, "rose-pine")
+    if ok and rp and rp.setup then
+      local v = vim.g.rose_pine_default_variant or "main"  -- change if you prefer
+      rp.setup({ variant = v, dark_variant = v })
+    end
+
+    vim.cmd("hi clear")         -- fully clear previous hi groups
+    vim.opt.termguicolors = true
+    pcall(vim.cmd.colorscheme, "rose-pine")
+    M.current = "rose-pine"
+    return true
+  end,
 }
 
 function M.use(name)
@@ -51,11 +63,12 @@ function M.apply_default()
   M.use(want)
 end
 
--- Commands (safe, generic)
+-- make :ThemeUse completion dynamic
 vim.api.nvim_create_user_command("ThemeUse", function(opts) M.use(opts.args) end, {
   nargs = 1,
-  complete = function() return { "mira", "nord" } end,
+  complete = function() return M.list() end,  -- ← includes rose-pine now
 })
+
 vim.api.nvim_create_user_command("ThemeToggle", function() M.toggle() end, {})
 vim.api.nvim_create_user_command("ThemeStatus", function()
   vim.notify(("Theme: %s\ntermguicolors=%s"):format(M.current or "(none)", tostring(vim.o.termguicolors)))
