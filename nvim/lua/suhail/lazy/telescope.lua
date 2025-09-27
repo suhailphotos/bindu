@@ -134,10 +134,14 @@ return {
   end)(),
 
   config = function()
+    -- size knobs (change these)
+    vim.g.telescope_height_scale = 0.80  -- 0–1, % of available rows after padding
+    vim.g.telescope_width_scale  = 0.88  -- optional; leave nil to inherit from scale
+    vim.g.telescope_padding      = 2     -- cells kept free on each edge
+    vim.g.telescope_min_height   = 28    -- safety floor in rows (optional)
     require("telescope").setup({
       defaults = {
-        -- keep defaults minimal; we pass exact size/titles per picker
-        border = false,
+        border = true,                    -- needed for the title “pills”
         winblend = 0,
         dynamic_preview_title = true,
         selection_caret = " ",
@@ -145,7 +149,33 @@ return {
         prompt_prefix   = "   ",
         sorting_strategy = "ascending",
         layout_strategy  = "horizontal",
-        layout_config    = { prompt_position = "top", preview_cutoff = 80 },
+        layout_config    = {
+          prompt_position = "top",
+          preview_cutoff  = 80,
+
+          -- make size follow your globals even for :Telescope
+          width = function(_, cols, _)
+            local pad      = tonumber(vim.g.telescope_padding) or 10
+            local minw     = tonumber(vim.g.telescope_min_width) or 90
+            local scale    = tonumber(vim.g.telescope_width_scale or vim.g.telescope_scale or 0.88)
+            local avail    = math.max(1, cols - 2 * pad)
+            local by_scale = math.floor(avail * math.max(0.1, math.min(scale, 1.0)))
+            return math.max(minw, by_scale)
+          end,
+
+          height = function(_, _, lines)
+            local ch       = vim.o.cmdheight or 1
+            local pad      = tonumber(vim.g.telescope_padding) or 10
+            local minh     = tonumber(vim.g.telescope_min_height) or 24
+            local scale    = tonumber(vim.g.telescope_height_scale or vim.g.telescope_scale or 0.88)
+            local avail    = math.max(1, (lines - ch) - 2 * pad)
+            local by_scale = math.floor(avail * math.max(0.1, math.min(scale, 1.0)))
+            return math.max(minh, by_scale)
+          end,
+
+          -- preview width as a fraction of the picker
+          preview_width = tonumber(vim.g.telescope_preview_ratio) or 0.55,
+        },
       },
     })
 
