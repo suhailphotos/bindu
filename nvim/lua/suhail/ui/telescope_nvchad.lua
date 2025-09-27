@@ -36,23 +36,26 @@ end
 
 local function apply_ansi()
   -- ANSI 0 = black, 8 = bright black
-  set("TelescopeBorder",         { ctermfg = 0, ctermbg = 0 })
-  set("TelescopeResultsBorder",  { ctermfg = 0, ctermbg = 0 })
-  set("TelescopePreviewBorder",  { ctermfg = 0, ctermbg = 0 })
-  set("TelescopePromptBorder",   { ctermfg = 8, ctermbg = 8 })
+  local PROMPT = tonumber(vim.g.telescope_prompt_idx or 233) -- darker-than-bg
+  local SELECT = tonumber(vim.g.telescope_select_idx or 235) -- selection row
 
-  set("TelescopeNormal",         {               ctermbg = 0 })
-  set("TelescopeResultsNormal",  {               ctermbg = 0 })
-  set("TelescopePreviewNormal",  {               ctermbg = 0 })
-  set("TelescopePromptNormal",   { ctermfg = 7,  ctermbg = 8 }) -- white on bright-black
+  set("TelescopeBorder",         { ctermfg = PROMPT, ctermbg = PROMPT })
+  set("TelescopeResultsBorder",  { ctermfg = PROMPT, ctermbg = PROMPT })
+  set("TelescopePreviewBorder",  { ctermfg = PROMPT, ctermbg = PROMPT })
+  set("TelescopePromptBorder",   { ctermfg = SELECT, ctermbg = SELECT })
 
-  set("TelescopePromptPrefix",   { ctermfg = 1,  ctermbg = 8 }) -- red on bright-black
-  set("TelescopeSelection",      {               ctermbg = 8 })
+  set("TelescopeNormal",         {               ctermbg = PROMPT })
+  set("TelescopeResultsNormal",  {               ctermbg = PROMPT })
+  set("TelescopePreviewNormal",  {               ctermbg = PROMPT })
+  set("TelescopePromptNormal",   { ctermfg = 7,  ctermbg = SELECT }) -- white on bright-black
+
+  set("TelescopePromptPrefix",   { ctermfg = 1,  ctermbg = SELECT }) -- red on bright-black
+  set("TelescopeSelection",      {               ctermbg = SELECT })
 
   -- title "pills"
-  set("TelescopePromptTitle",    { ctermfg = 0, ctermbg = 1 })  -- red pill
-  set("TelescopePreviewTitle",   { ctermfg = 0, ctermbg = 2 })  -- green pill
-  set("TelescopeResultsTitle",   { ctermfg = 7, ctermbg = 8 })  -- optional second header bar
+  set("TelescopePromptTitle",    { ctermfg = PROMPT, ctermbg = 1 })  -- red pill
+  set("TelescopePreviewTitle",   { ctermfg = PROMPT, ctermbg = 2 })  -- green pill
+  set("TelescopeResultsTitle",   { ctermfg = 7, ctermbg = SELECT })  -- optional second header bar
 end
 
 function M.apply()
