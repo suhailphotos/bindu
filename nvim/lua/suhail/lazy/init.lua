@@ -17,4 +17,7 @@ return {
   require("suhail.lazy.vim_be_good"),
   require("suhail.lazy.nvterm"),
   require("suhail.lazy.nvimtree"),
+  require("suhail.lazy.rust"),
+  require("suhail.lazy.dap"),
+  require("suhail.lazy.crates"),
 }

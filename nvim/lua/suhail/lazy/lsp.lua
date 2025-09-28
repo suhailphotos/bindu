@@ -53,10 +53,13 @@ return {
       end,
     })
 
+    -- Disable pylsp by default
+    vim.lsp.config("pylsp", { enabled = false })
+
     -- Enable servers (autostart on matching filetypes)
     vim.lsp.enable("pyright")
     vim.lsp.enable("ruff")
-    vim.lsp.enable("rust_analyzer")
+    -- vim.lsp.enable("rust_analyzer")
     vim.lsp.enable("lua_ls")
 
     -- Nicer hover window, still minimal
