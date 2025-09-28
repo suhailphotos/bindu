@@ -144,7 +144,7 @@ return {
         border = true,                    -- needed for the title “pills”
         winblend = 0,
         dynamic_preview_title = true,
-        selection_caret = " ",
+        selection_caret = "▎",
         entry_prefix    = "  ",
         prompt_prefix   = "   ",
         sorting_strategy = "ascending",
