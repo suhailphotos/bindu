@@ -46,5 +46,29 @@ return {
         end
       end,
     })
+    -- ANSI 0 selection for nvim-tree
+    local function apply_tree_selection_ansi0()
+      -- only do ANSI when mira is in ansi_only mode
+      if vim.g.mira_ansi_only == true then
+        vim.api.nvim_set_hl(0, "NvimTreeCursorLine", { ctermbg = 0 })  -- ← ANSI 0
+      else
+        -- fallback for truecolor themes, if you ever toggle
+        vim.api.nvim_set_hl(0, "NvimTreeCursorLine", { bg = "#000000" })
+      end
+    end
+
+    -- ensure the row highlight is visible in the tree window
+    vim.api.nvim_create_autocmd("FileType", {
+      pattern = "NvimTree",
+      callback = function()
+        vim.wo.cursorline = true
+        apply_tree_selection_ansi0()
+      end,
+    })
+
+    -- re-apply on colorscheme switches
+    vim.api.nvim_create_autocmd("ColorScheme", {
+      callback = apply_tree_selection_ansi0,
+    })
   end,
 }
