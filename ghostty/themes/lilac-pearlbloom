@@ -18,5 +18,8 @@ palette = 233=#f7fafc
 palette = 235=#eaeaeb
 background = #f1f2f3
 foreground = #020202
+selection-background = #717476
+selection-foreground = #050505
 cursor-color = #7f7791
 cursor-text = #000000
+
