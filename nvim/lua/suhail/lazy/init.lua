@@ -15,4 +15,6 @@ return {
   require("suhail.lazy.undotree"),
   require("suhail.lazy.fugitive"),
   require("suhail.lazy.vim_be_good"),
+  require("suhail.lazy.nvterm"),
+  require("suhail.lazy.nvimtree"),
 }
