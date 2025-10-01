@@ -20,4 +20,5 @@ return {
   require("suhail.lazy.rust"),
   require("suhail.lazy.dap"),
   require("suhail.lazy.crates"),
+  require("suhail.lazy.notio"),
 }
