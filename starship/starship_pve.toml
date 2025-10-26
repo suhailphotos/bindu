@@ -7,11 +7,9 @@ palette = "suhail-macos-ansi"
 # =========================
 # Prompt layout
 # =========================
-# Left: OS  hostname  directory  prompt-char
-format = '$os$hostname${env_var.not_home}$directory$git_branch$line_break$character'
+format = '$os$hostname${env_var.not_home}$directory${env_var.tmux_seg}$python${env_var.py_name}$conda$git_branch$git_status${env_var.bindu_ahead}${env_var.bindu_behind}${env_var.bindu_diverged}$status$cmd_duration$line_break$character'
 
-# Right (keep this order): status, duration, jobs, time, git status, git branch, python version, venv name, conda
-right_format = "$status$cmd_duration$jobs$time$git_status${env_var.py_name}$python$conda"
+
 add_newline = true
 
 
@@ -19,9 +17,9 @@ add_newline = true
 # OS indicator
 # -------------
 [os]
-disabled = false
+disabled = true
 format = "[$symbol]($style)"
-style = "fg:ui_mono"
+style = "fg:dim"
 
 [os.symbols]
 # mac / windows
@@ -58,13 +56,55 @@ FreeBSD     = " "
 # Hostname (built-in, fast)
 # --------------------------
 [hostname]
+disabled = false
+trim_at = "."
 ssh_only = false
-format = "[$hostname]($style)  "
-style = "fg:host"
+format = "[$hostname]($style) "
+style = "fg:dim"
 
+[hostname.aliases]
+feather = ""
+quasar  = "󰖨"
+nimbus  = ""
+eclipse = ""
+flicker = ""
+nexus   = "󰴗"
+zion    = ""
+
+
+# ----------------------------
+# Environment Variables
+# ----------------------------
 [env_var.not_home]
+disabled = true
 variable = "STARSHIP_NOT_HOME"
-format = '[ ](fg:dim)'
+format = '[  ](fg:dim)'
+
+[env_var.tmux_seg]
+variable = "STARSHIP_TMUX_SEG"
+format = '[$env_value](fg:ui_mono)'
+disabled = false
+
+
+# ---- Bindu ------------
+[env_var.bindu_ahead]
+variable = "STARSHIP_BINDU_AHEAD"
+style = "fg:git_ahead"
+format = ' [$env_value]($style)'
+disabled = false
+
+[env_var.bindu_behind]
+variable = "STARSHIP_BINDU_BEHIND"
+style = "fg:git_behind"
+format = ' [$env_value]($style)'
+disabled = false
+
+[env_var.bindu_diverged]
+variable = "STARSHIP_BINDU_DIVERGED"
+style = "fg:git_diverged"
+format = ' [$env_value]($style)'
+disabled = false
+
 
 # ---------------
 # Directory path
@@ -81,41 +121,53 @@ truncation_symbol = "…/"
 # - before_root_path  (stuff above repo root): dim (like your "parent")
 # - repo_root         (the repo folder itself): italic, "current" color
 # - path              (subdirs under repo root): italic, "current" color
-format = '[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)'
+format = '[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path ]($style)'
 before_repo_root_style = 'fg:path_parent'
-repo_root_style        = 'italic fg:path_current'
+repo_root_style        = 'bold fg:path_current'
 style                  = 'fg:path_default'
 
 # ----------
 # Character
 # ----------
 [character]
-success_symbol = '[%](bold fg:ok)'
-error_symbol   = '[%](bold fg:err)'
+success_symbol = '[#](bold fg:ok)'
+error_symbol   = '[#](bold fg:err)'
 
 # --------------------
-# Right-side (minimal)
+# Status
 # --------------------
 [status]
 disabled = false
+pipestatus = true
+recognize_signal_code = true
 format = ' [${status}](fg:err) '              # ← trailing space
 
+# --------------------------------------------------
+# Command Duration
+# --------------------------------------------------
 [cmd_duration]
-min_time = 3000
-format = ' [$duration](fg:dim) '              # ← trailing space
+disabled = true
+min_time = 2_000
+show_milliseconds = false
+min_time_to_notify = 45_000
+format = ' [$duration](fg:dim) '
 
 [jobs]
 symbol = '⚙'
-format = ' [$symbol$number](fg:dim) '         # ← trailing space
+format = ' [$symbol$number](fg:dim) '
 
 [time]
+disabled = true
 time_format = '%H:%M'
-format = ' [$time](fg:dim) '                  # ← trailing space (you already had this)
+format = ' [$time](fg:dim) '
 
+# --------------------------------------------------
+# Python Environment
+# --------------------------------------------------
 # venv name from PROMPT_PY_ENV_NAME: add trailing space after the joining dot
 [env_var.py_name]
 variable = "PROMPT_PY_ENV_NAME"
-format   = '[$env_value](italic fg:python_fg)[·](fg:dim)'
+format   = '[$env_value](bold fg:python_fg) '
 
 # Python glyph only; add trailing space (no leading dot)
 [python]
@@ -123,13 +175,16 @@ symbol             = ""
 style              = "fg:dim"
 pyenv_version_name = false
 python_binary      = "python3"
-format             = '[$symbol]($style) '
+format             = ' [$symbol]($style) '
+detect_extensions = ['py', 'ipynb']
+detect_files = ['pyproject.toml', 'requirements.txt', 'setup.py', 'Pipfile', 'pyrightconfig.json']
+detect_folders = ['.venv', 'venv', '.pixi']
 
 # Conda env block; add trailing space at the end
 [conda]
 symbol = ''
 style  = 'fg:dim'
-format = '[·](fg:dim)[$environment](italic fg:python_fg)[·](fg:dim)[🅒](fg:dim) '
+format = '[🅒](fg:dim) [$environment](bold fg:python_fg) '
 
 # ----------
 # Git status (dot + special parentheses, palette-driven colors)
@@ -137,27 +192,31 @@ format = '[·](fg:dim)[$environment](italic fg:python_fg)[·](fg:dim)[🅒](fg:d
 [git_status]
 # Render only when there is something to show;
 # include special parens and trailing dot inside the module.
-format = '([·](fg:dim)[❪](fg:dim)$staged$modified$renamed$deleted$conflicted$untracked$ahead_behind$stashed[❫](fg:dim))'
+format = '($staged$modified$renamed$deleted$conflicted$untracked$ahead_behind$stashed)'
 style = "fg:dim"
 
 # Per-status strings with dedicated colors; counts are dim
-staged      = '[+](bold fg:git_staged)[${count}](fg:git_count)'
-modified    = '[!](bold fg:git_modified)[${count}](fg:git_count)'
-renamed     = '[»](bold fg:git_renamed)[${count}](fg:git_count)'
-deleted     = '[✘](bold fg:git_deleted)[${count}](fg:git_count)'
-conflicted  = '[~](bold fg:git_conflicted)[${count}](fg:git_count)'
-untracked   = '[?](bold fg:git_untracked)[${count}](fg:git_count)'
-stashed     = '[*](bold fg:git_stashed)[${count}](fg:git_count)'
+staged      = '[·](fg:dim)[+](bold fg:git_staged)[${count}](dimmed fg:git_staged)'
+modified    = '[·](fg:dim)[!](bold fg:git_modified)[${count}](dimmed fg:git_modified)'
+renamed     = '[·](fg:dim)[»](bold fg:git_renamed)[${count}](dimmed fg:git_renamed)'
+deleted     = '[·](fg:dim)[✘](bold fg:git_deleted)[${count}](dimmed fg:git_deleted)'
+conflicted  = '[·](fg:dim)[~](bold fg:git_conflicted)[${count}](dimmed fg:git_conflicted)'
+untracked   = '[·](fg:dim)[?](bold fg:git_untracked)[${count}](dimmed fg:git_untracked)'
+stashed     = '[·](fg:dim)[*](bold fg:git_stashed)[${count}](dimmed fg:git_stashed)'
 
 # Sync counts (arrows colored; numbers dim)
-ahead       = '[⇡](bold fg:git_ahead)[${count}](fg:git_count)'
-behind      = '[⇣](bold fg:git_behind)[${count}](fg:git_count)'
-diverged    = '[⇕](bold fg:git_diverged)[⇡](fg:git_ahead)[${ahead_count}](fg:git_count)[⇣](fg:git_behind)[${behind_count}](fg:git_count)'
+ahead       = '[·](fg:dim)[⇡](bold fg:git_ahead)[${count}](dimmed fg:git_ahead)'
+behind      = '[·](fg:dim)[⇣](bold fg:git_behind)[${count}](dimmed fg:git_behind)'
+diverged    = '[·](fg:dim)[⇕](bold fg:git_diverged)[⇡](fg:git_ahead)[${ahead_count}](fg:git_count)[⇣](fg:git_behind)[${behind_count}](fg:git_count)'
 
 [git_branch]
-symbol = " "
+symbol = "·"
+truncation_length = 24
+truncation_symbol = '…'
 format = " [$symbol](fg:dim)[$branch]($style)"
 style = "italic fg:git_branch"
+
+
 
 # =========================
 # Palettes (role → color)
@@ -167,13 +226,14 @@ style = "italic fg:git_branch"
 [palettes.suhail-macos-ansi]
 ui_mono        = "bright-black"
 dim            = "bright-black"
+
 # path
-path_default   = "cyan"
+path_default   = "white"
 path_parent    = "bright-black"
-path_current   = "purple"
+path_current   = "bright-white"
 path_ellipsis  = "bright-black"
 # git
-git_branch     = "cyan"
+git_branch     = "bright-black"
 git_count      = "bright-black"
 git_untracked  = "yellow"
 git_modified   = "yellow"
@@ -188,7 +248,7 @@ git_diverged   = "yellow"
 # python
 python_fg      = "yellow"
 # prompt state + host color
-ok             = "green"
+ok             = "bright-green"
 err            = "red"
 host           = "blue"
 
@@ -211,13 +271,13 @@ git_stashed    = "blue"
 git_ahead      = "green"
 git_behind     = "red"
 git_diverged   = "yellow"
-ok             = "green"
+ok             = "#89d88b"
 err            = "red"
 host           = "green"
 
 [palettes.suhail-windows-ansi]
 ui_mono        = "bright-black"
-dim            = "bright-black"
+dim            = "black"
 path_parent    = "bright-black"
 path_current   = "purple"
 path_ellipsis  = "bright-black"
@@ -304,3 +364,5 @@ git_diverged   = "#eab308"
 ok             = "#22c55e"
 err            = "#ef4444"
 host           = "#eab308"
+
+
