@@ -1,5 +1,26 @@
+# Linux / cross-platform junk (same essentials, macOS-specific items are harmless on Linux too)
 **/.DS_Store
+.AppleDouble
+.AppleDesktop
+._*
+Thumbs.db
+
+# Neovim plugin manager / config
 nvim/lazy-lock.json
+lazy-lock.json
+iterm2/
 op/
 fontforge/
-iterm2/
+
+# Environment and secrets
+.env
+secrets.env
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Node.js / build outputs
+node_modules/
+dist/
+build/
