@@ -24,3 +24,6 @@ __pycache__/
 node_modules/
 dist/
 build/
+
+# uv
+uv/uv-receipt.json
