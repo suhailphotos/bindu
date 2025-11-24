@@ -63,7 +63,7 @@ format = "[$hostname]($style) "
 style = "fg:dim"
 
 [hostname.aliases]
-feather = ""
+feather = ""
 quasar  = "󰖨"
 nimbus  = ""
 eclipse = ""
@@ -211,7 +211,7 @@ behind      = '[·](fg:dim)[⇣](bold fg:git_behind)[${count}](dimmed fg:git_beh
 diverged    = '[·](fg:dim)[⇕](bold fg:git_diverged)[⇡](fg:git_ahead)[${ahead_count}](fg:git_count)[⇣](fg:git_behind)[${behind_count}](fg:git_count)'
 
 [git_branch]
-symbol = "·"
+symbol = "·"
 truncation_length = 24
 truncation_symbol = '…'
 format = " [$symbol](fg:dim)[$branch]($style)"
