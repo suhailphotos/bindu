@@ -1,16 +1,13 @@
--- crates.nvim (Cargo.toml niceties) + cmp source only in TOML buffers
+-- lua/suhail/lazy/crates.lua
 return {
   "saecki/crates.nvim",
-  ft = { "toml" },
+  event = { "BufReadPre Cargo.toml", "BufNewFile Cargo.toml" },
   dependencies = { "nvim-lua/plenary.nvim" },
-  config = function()
-    require("crates").setup({
-      completion = { cmp = { enabled = true } },
-    })
-    -- Add cmp source just for this buffer
-    local ok, cmp = pcall(require, "cmp")
-    if ok then
-      cmp.setup.buffer({ sources = { { name = "crates" } } })
-    end
+  opts = {
+    lsp = { enabled = true, actions = true, completion = true, hover = true },
+    completion = { crates = { enabled = true, max_results = 8, min_chars = 3 } },
+  },
+  config = function(_, opts)
+    require("crates").setup(opts)
   end,
 }
