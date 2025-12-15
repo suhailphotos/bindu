@@ -30,7 +30,23 @@ schema_version = 2
 default_shell  = "zsh"          # "zsh" | "bash" | "fish" | "pwsh"
 platforms      = ["mac", "linux", "windows", "wsl", "other"]
 
-secrets_file   = "$XDG_CONFIG_HOME/apogee/secrets.env"
+# Secrets should follow the resolved config location.
+# (If you prefer XDG-based secrets, set this back to "$XDG_CONFIG_HOME/apogee/secrets.env")
+secrets_file   = "{config_dir}/secrets.env"
+
+# --------------------------------
+# Bootstrap (read-time only)
+# --------------------------------
+[apogee.bootstrap.defaults.env]
+# Only applied if missing in the process env.
+XDG_CONFIG_HOME = "{home}/.config"
+XDG_CACHE_HOME  = "{home}/.cache"
+XDG_DATA_HOME   = "{home}/.local/share"
+XDG_STATE_HOME  = "{home}/.local/state"
+
+[apogee.bootstrap.secrets]
+# If a secret key already exists in the process env, keep it.
+strategy = "fill_missing" # "fill_missing" | "override"
 
 [modules]
 enable_cloud = true
