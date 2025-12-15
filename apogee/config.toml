@@ -1,398 +1,232 @@
 # ===================================================================
-# apogee config v2
+# apogee config v2 (modules-first)
 #
-# Scope:
-#   - env vars
-#   - PATH wiring
-#   - aliases
-#   - detection-based modules (cloud, apps, custom hooks)
+# Goals:
+#   - apogee detects context (platform, shell, host)
+#   - modules decide if they are ACTIVE based on detection rules
+#   - ONLY active modules emit env/paths/aliases/functions/snippets
 #
-# apogee will:
-#   - detect platform (mac | linux | wsl | other)
-#   - detect host (hostname -s)
-#   - detect shell (zsh | bash | pwsh) via env/argv
-#   - run detection modules
-#   - merge global + platform + host scopes
-#   - emit shell code to eval in rc files
+# Philosophy:
+#   - "global" should only contain things that depend on platform/shell,
+#     not on whether Dropbox/git/etc exists.
+#   - Anything that depends on an app/service/root path should live in a module.
+#
+# Detection model (per module):
+#   - detect.paths.<platform>.any_of: folder exists -> module active
+#   - detect.commands.any_of: command exists in PATH -> module active
+#   - detect.files.<platform>.any_of: file/glob exists -> module active (desktop apps)
+#   - detect.env.any_of: env var present -> module active (optional)
+#
+# Emission model (per module, only when active):
+#   - emit.env: sets env vars (shell-specific export/set semantics handled by apogee)
+#   - emit.paths: prepend/append PATH entries if they exist
+#   - emit.aliases: aliases (or functions-on-fish if you choose)
+#   - emit.functions: load functions (prefer files), and/or inline
 # ===================================================================
 
 [apogee]
 schema_version = 2
-default_shell  = "zsh"          # "zsh" | "bash" | "pwsh"
-platforms      = ["mac", "linux", "wsl", "other"]
 
-# -------------------------------------------------------------------
-# Modules: detection-style "blocks" inspired by starship modules
-# -------------------------------------------------------------------
+default_shell  = "zsh"          # "zsh" | "bash" | "fish" | "pwsh"
+platforms      = ["mac", "linux", "windows", "wsl", "other"]
+
+secrets_file   = "$XDG_CONFIG_HOME/apogee/secrets.env"
 
 [modules]
-enable_cloud = true   # toggle all cloud modules
-enable_apps  = true   # toggle all app modules
-enable_hooks = true   # toggle custom hook scripts
+enable_cloud = true
+enable_apps  = true
+enable_hooks = true
 
-# ----------------------
-# Cloud storage modules
-# ----------------------
+# ===================================================================
+# GLOBAL (platform/shell only)
+# ===================================================================
+
+[global]
+
+[global.aliases.platform.mac]
+o = "open ."
+
+[global.aliases.platform.linux]
+o = "xdg-open ."
+
+[global.aliases.platform.windows]
+o = "explorer.exe ."
+
+[global.aliases.platform.wsl]
+o = "explorer.exe ."
+
+# ===================================================================
+# MODULES: CLOUD
+# ===================================================================
+
 [modules.cloud]
 enabled = true
 
-# If a candidate path exists, set DROPBOX=<that path>
-# First match wins.
+# ----------------------
+# Dropbox (cloud storage)
+# ----------------------
 [modules.cloud.dropbox]
 enabled   = true
-platforms = ["mac", "linux", "wsl", "other"]
-candidate_paths = [
-  "$HOME/Library/CloudStorage/Dropbox",  # mac
-  "$HOME/Dropbox",                       # linux, generic
-  "$USERPROFILE/Dropbox",                # windows / wsl
-]
-set_env = "DROPBOX"
+kind      = "storage"
+platforms = ["mac", "linux", "windows", "wsl", "other"]
 
-# If a candidate path exists, set DATALIB=<that path>
-[modules.cloud.synology_datalib]
-enabled   = true
-platforms = ["mac", "linux", "wsl", "other"]
-candidate_paths = [
-  "$HOME/Library/CloudStorage/SynologyDrive-dataLib",  # mac
-  "/mnt/dataLib",                                      # linux
-  "$USERPROFILE/Synology-dataLib",                     # wsl/win
+[modules.cloud.dropbox.detect.paths.mac]
+any_of = [
+  "$HOME/Library/CloudStorage/Dropbox",
+  "$HOME/Dropbox",
 ]
-set_env = "DATALIB"
 
-# Nebula AI root detection; overrides NEBULA_AI_ROOT if present
-[modules.cloud.nebula_ai]
-enabled   = true
-platforms = ["mac", "linux"]
-candidate_paths = [
-  "/Volumes/ai",  # mac
-  "/mnt/ai",      # linux
+[modules.cloud.dropbox.detect.paths.linux]
+any_of = ["$HOME/Dropbox"]
+
+[modules.cloud.dropbox.detect.paths.windows]
+any_of = [
+  "$USERPROFILE/Dropbox",
 ]
-set_env = "NEBULA_AI_ROOT"
 
-# ----------------------
-# App / tool modules
-# ----------------------
+[modules.cloud.dropbox.detect.paths.wsl]
+any_of = [
+  "$USERPROFILE/Dropbox",
+  "/mnt/c/Users/$USERNAME/Dropbox",
+]
+
+[modules.cloud.dropbox.detect.paths.other]
+any_of = ["$HOME/Dropbox"]
+
+[modules.cloud.dropbox.emit.env]
+DROPBOX = "{detect.path}"
+
+[modules.cloud.dropbox.emit.env_derived]
+MATRIX   = "$DROPBOX/matrix"
+PACKAGES = "$MATRIX/packages"
+CRATES   = "$MATRIX/crates"
+
+[modules.cloud.dropbox.emit.aliases]
+matrix   = "cd \"$MATRIX\""
+packages = "cd \"$PACKAGES\""
+crates   = "cd \"$CRATES\""
+
+orbit    = "cd \"$DROPBOX/matrix/orbit\""
+helix    = "cd \"$DROPBOX/matrix/helix\""
+tessera  = "cd \"$DROPBOX/matrix/tessera\""
+
+apogee   = "cd \"$DROPBOX/matrix/crates/apogee\""
+rusk     = "cd \"$DROPBOX/matrix/crates/rusk\""
+
+[modules.cloud.dropbox.emit.paths]
+prepend_if_exists = ["$DROPBOX/matrix/bin"]
+append_if_exists  = []
+
+# ===================================================================
+# MODULES: APPS
+# ===================================================================
+
 [modules.apps]
 enabled = true
 
-# example semantics:
-#   - if `command` exists in PATH, then:
-#       - apply env overrides
-#       - emit aliases listed here
-#
-# apogee can also respect per-platform/host guards later.
+# ----------------------
+# git (CLI app)
+# ----------------------
+[modules.apps.git]
+enabled   = true
+kind      = "cli"
+platforms = ["mac", "linux", "windows", "wsl", "other"]
 
+[modules.apps.git.detect.commands]
+any_of = ["git"]
+
+[modules.apps.git.detect.version]
+command = "git"
+args = ["--version"]
+regex = "(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)"
+
+[modules.apps.git.emit.aliases]
+gs = "git status"
+lg = "lazygit"
+
+[modules.apps.git.emit.functions]
+files = ["$XDG_CONFIG_HOME/apogee/functions/git.sh"]
+
+# ----------------------
+# eza (CLI app)
+# ----------------------
 [modules.apps.eza]
-enabled       = true
-command       = "eza"
-env = { USE_EZA = "1" }
-aliases = { ls = "eza", ll = "eza -l", la = "eza -la" }
+enabled   = true
+kind      = "cli"
+platforms = ["mac", "linux", "windows", "wsl", "other"]
 
-[modules.apps.zoxide]
-enabled       = true
-command       = "zoxide"
-env = { USE_ZOXIDE = "1" }
-# apogee can generate the proper `eval "$(zoxide init <shell>)"` per shell.
+[modules.apps.eza.detect.commands]
+any_of = ["eza"]
 
-[modules.apps.ripgrep]
-enabled       = true
-command       = "rg"
-env = { RIPGREP_CONFIG_PATH = "$XDG_CONFIG_HOME/ripgrep/ripgreprc" }
+[modules.apps.eza.detect.version]
+command = "eza"
+args = ["--version"]
+regex = "(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)"
 
-[modules.apps.fd]
-enabled       = true
-command       = "fd"
-env = { FD_OPTIONS = "--hidden --ignore-file=$XDG_CONFIG_HOME/search/ignore" }
+[modules.apps.eza.emit.env]
+USE_EZA = "1"
 
-[modules.apps.nvim]
-enabled       = true
-command       = "nvim"
-env = { EDITOR = "nvim", VISUAL = "nvim", GIT_EDITOR = "nvim" }
-
-# You can add more app modules later:
-# [modules.apps.houdini]
-# enabled = true
-# detect_files = ["/opt/hfs", "/Applications/Houdini*.app"]
+[modules.apps.eza.emit.aliases]
+ls = "eza"
+ll = "eza -l"
+la = "eza -la"
 
 # ----------------------
-# Custom hooks (user scripts)
+# Houdini (desktop app example)
 # ----------------------
-# apogee does not interpret these; it just runs/sources them
-# when the conditions match (platform/hosts/shells).
-#
-# You can use this for things apogee doesn’t know about yet.
+[modules.apps.houdini]
+enabled   = false
+kind      = "desktop"
+platforms = ["mac", "linux", "windows"]
 
-[[modules.custom]]
+[modules.apps.houdini.detect.files.mac]
+any_of = ["/Applications/Houdini*.app"]
+
+[modules.apps.houdini.detect.files.linux]
+any_of = ["/opt/hfs*"]
+
+[modules.apps.houdini.detect.files.windows]
+any_of = [
+  "C:/Program Files/Side Effects Software/Houdini*"
+]
+
+[modules.apps.houdini.detect.version.mac]
+type  = "path_regex"
+# apogee will use the first matched path from detect.files.mac.any_of
+# then run this regex against that path to get the version.
+regex = "Houdini\\s*(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+).*\\.app$"
+
+[modules.apps.houdini.detect.version.linux]
+type  = "path_regex"
+# Typical installs are /opt/hfs20.5.456 or /opt/hfs19.5.716 etc
+regex = "hfs(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)$"
+
+[modules.apps.houdini.detect.version.windows]
+type  = "path_regex"
+# Often looks like .../Houdini 20.5.456 (folder)
+regex = "Houdini\\s*(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)$"
+
+
+[modules.apps.houdini.emit.env]
+
+# ===================================================================
+# MODULES: HOOKS
+# ===================================================================
+
+[modules.hooks]
+enabled = true
+
+[[modules.hooks.items]]
+name      = "after-core-mac"
+enabled   = true
+platforms = ["mac"]
+shells    = ["zsh", "bash"]
+script    = "$XDG_CONFIG_HOME/apogee/hooks/after-core-mac.sh"
+
+[[modules.hooks.items]]
 name      = "after-core-linux"
 enabled   = true
 platforms = ["linux"]
 hosts     = ["nimbus", "flicker", "nexus"]
 shells    = ["zsh", "bash"]
-script    = "$HOME/.config/apogee/hooks/after-core-linux.sh"
-
-[[modules.custom]]
-name      = "after-core-mac"
-enabled   = true
-platforms = ["mac"]
-shells    = ["zsh", "bash"]
-script    = "$HOME/.config/apogee/hooks/after-core-mac.sh"
-
-# ===================================================================
-# ENVIRONMENT
-# ===================================================================
-
-# -------------------------------------------------------------------
-# Global environment (applies everywhere, all shells)
-# -------------------------------------------------------------------
-[env.global]
-XDG_CONFIG_HOME   = "$HOME/.config"
-
-EDITOR            = "nvim"
-VISUAL            = "nvim"
-GIT_EDITOR        = "nvim"
-
-# Shared roots (defined in terms of other vars)
-MATRIX            = "$DROPBOX/matrix"
-DOCKER            = "$MATRIX/docker"
-BASE_DIR          = "$MATRIX/shellscripts"
-PACKAGES          = "$MATRIX/packages"
-CRATES            = "$MATRIX/crates"
-
-# Synology / course / vault
-ML4VFX            = "$DATALIB/threeD/courses/05_Machine_Learning_in_VFX"
-OBSIDIAN          = "$MATRIX/obsidian/jnanaKosha"
-
-# uv defaults
-UV_VENV_ROOT      = "$HOME/.venvs"       # external envs
-UV_DEFAULT_PY     = "auto-houdini"       # or "3.12", etc.
-UV_TOOL_DIR       = "$HOME/.local/share/uv/tools"
-UV_TOOL_BIN_DIR   = "$HOME/.local/share/uv/bin"
-
-# zoxide toggle (may be overridden by modules.apps.zoxide)
-USE_ZOXIDE        = "1"
-
-# base toggles
-USE_CONDA         = "0"
-USE_EZA           = "1"                  # modules.eza may enforce this
-
-# Colors / pager defaults
-LESS              = "-R"
-PAGER             = "less"
-
-# Search defaults (may be overridden by modules.apps.*)
-RIPGREP_CONFIG_PATH  = "$XDG_CONFIG_HOME/ripgrep/ripgreprc"
-FD_OPTIONS           = "--hidden --ignore-file=$XDG_CONFIG_HOME/search/ignore"
-
-# Terminfo: prefer ~/.terminfo first
-TERMINFO_DIRS        = "$HOME/.terminfo:/usr/share/terminfo"
-
-# Cargo global target dir (keeps Dropbox / repos clean)
-CARGO_TARGET_DIR     = "$HOME/.cache/cargo/targets"
-
-# bindu defaults (autosync for ~/.config)
-BINDU_DIR            = "$XDG_CONFIG_HOME"
-BINDU_REMOTE         = "origin"
-BINDU_FETCH_INTERVAL = "600"   # seconds
-BINDU_AUTO_FF_PULL   = "1"
-BINDU_AUTOSYNC       = "0"     # 1 = enable autosync on prompt
-
-# Locale fallback used by your UTF-8 logic
-DEFAULT_LOCALE       = "C.UTF-8"
-
-# -------------------------------------------------------------------
-# Per-platform env (keys: mac, linux, wsl, other)
-# These are applied after env.global.
-# Cloud-related vars may get overridden by modules.cloud.* detection.
-# -------------------------------------------------------------------
-
-[env.platform.mac]
-# If modules.cloud.dropbox is enabled, DROPBOX will be detected.
-# If not found, this acts as a fallback.
-DROPBOX                = "$HOME/Library/CloudStorage/Dropbox"
-DATALIB                = "$HOME/Library/CloudStorage/SynologyDrive-dataLib"
-NEBULA_AI_ROOT         = "/Volumes/ai"
-
-NVIM_BG_MODE           = "auto"          # "auto" | "light" | "dark"
-
-scrcap                 = "$HOME/Documents/Scratch/screenshots"
-projexp                = "$HOME/Documents/Scratch/exports"
-
-[env.platform.linux]
-# Fallbacks; modules may override them
-DROPBOX                = "$HOME/Dropbox"
-DATALIB                = "/mnt/dataLib"
-NEBULA_AI_ROOT         = "/mnt/ai"
-
-# iCloud-over-SSHFS wiring for Linux hosts
-ICLOUD_HOST            = "quasar"
-ICLOUD_REMOTE_PATH     = "Documents"
-ICLOUD_IDENTITY        = "$HOME/.ssh/id_quasar"
-ICLOUD_MOUNT_ROOT      = "$HOME/icloudDocs"
-projexp                = "$ICLOUD_MOUNT_ROOT/Scratch/exports"
-
-[env.platform.wsl]
-DROPBOX                = "$USERPROFILE/Dropbox"
-DATALIB                = "$USERPROFILE/Synology-dataLib"
-NEBULA_AI_ROOT         = "Z:/ai"
-
-[env.platform.other]
-DROPBOX                = "$HOME/Dropbox"
-DATALIB                = "$HOME/Synology-dataLib"
-NEBULA_AI_ROOT         = "$HOME/ai"
-
-# -------------------------------------------------------------------
-# NEBULA AI derived paths (only meaningful if NEBULA_AI_ROOT exists)
-# apogee can choose to set these only if NEBULA_AI_ROOT is present.
-# -------------------------------------------------------------------
-[env.nebula]
-NEBULA_AI_MODELS      = "$NEBULA_AI_ROOT/models"
-NEBULA_AI_DATASETS    = "$NEBULA_AI_ROOT/datasets"
-NEBULA_AI_EXPERIMENTS = "$NEBULA_AI_ROOT/experiments"
-NEBULA_AI_LOGS        = "$NEBULA_AI_ROOT/logs"
-NEBULA_AI_SCRIPTS     = "$NEBULA_AI_ROOT/scripts"
-NEBULA_AI_PROJECTS    = "$NEBULA_AI_ROOT/projects"
-
-# -------------------------------------------------------------------
-# Per-host env overrides / extras
-# host names should match `hostname -s`
-# -------------------------------------------------------------------
-
-[env.host.nimbus]
-USE_CONDA       = "1"
-
-CUDA_HOME       = "/usr/local/cuda"
-LD_LIBRARY_PATH = "$CUDA_HOME/lib64:$LD_LIBRARY_PATH"
-
-macdocs         = "quasar:~/Documents"
-macnotes        = "quasar:~/Documents/Scratch/notes"
-macexports      = "quasar:~/Documents/Scratch/exports"
-
-[env.host.flicker]
-USE_CONDA       = "0"
-
-[env.host.nexus]
-USE_CONDA       = "0"
-
-# ===================================================================
-# PATH wiring
-# ===================================================================
-
-[paths.global]
-prepend_if_exists = [
-  "$HOME/.local/bin",
-  "$UV_TOOL_BIN_DIR",
-]
-append_if_exists = []
-
-[paths.platform.mac]
-prepend_if_exists = [
-  "/opt/homebrew/bin",
-  "/usr/local/bin",
-]
-append_if_exists  = []
-
-[paths.platform.linux]
-prepend_if_exists = [
-  "/usr/local/bin",
-  "/usr/bin",
-]
-append_if_exists  = []
-
-[paths.platform.wsl]
-prepend_if_exists = [
-  "/usr/bin",
-  "/usr/local/bin",
-]
-append_if_exists  = []
-
-[paths.platform.other]
-prepend_if_exists = []
-append_if_exists  = []
-
-[paths.host.nimbus]
-prepend_if_exists = [
-  "$HOME/.cargo/bin",
-]
-append_if_exists  = []
-
-[paths.host.flicker]
-prepend_if_exists = [
-  "$HOME/.cargo/bin",
-]
-append_if_exists  = []
-
-[paths.host.nexus]
-prepend_if_exists = [
-  "$HOME/.cargo/bin",
-]
-append_if_exists  = []
-
-# ===================================================================
-# Projects (Orbit's PROJECTS → generic)
-# ===================================================================
-
-[projects]
-managed = [
-  "usdUtils",
-  "oauthManager",
-  "pythonKitchen",
-  "ocioTools",
-  "helperScripts",
-  "Incept",
-  "pariVaha",
-  "Lumiera",
-  "Ledu",
-  "hdrUtils",
-]
-
-houdini_packages = [
-  "houdiniLab",
-  "houdiniUtils",
-]
-
-# ===================================================================
-# Aliases
-# ===================================================================
-
-[aliases.global]
-nv        = "nvim"
-matrix    = "cd \"$MATRIX\""
-packages  = "cd \"$PACKAGES\""
-crates    = "cd \"$CRATES\""
-bindu     = "cd \"$XDG_CONFIG_HOME\""
-
-# Git
-gs        = "git status"
-lg        = "lazygit"
-
-# Top-level projects
-orbit     = "cd \"$DROPBOX/matrix/orbit\""
-helix     = "cd \"$DROPBOX/matrix/helix\""
-tessera   = "cd \"$DROPBOX/matrix/tessera\""
-truss     = "cd \"$DROPBOX/matrix/truss\""
-iris      = "cd \"$DROPBOX/matrix/iris\""
-atrium    = "cd \"$DROPBOX/matrix/atrium\""
-
-# Rust crates
-apogee    = "cd \"$DROPBOX/matrix/crates/apogee\""
-swivel    = "cd \"$DROPBOX/matrix/crates/swivel\""
-rillio    = "cd \"$DROPBOX/matrix/crates/rillio\""
-rusk      = "cd \"$DROPBOX/matrix/crates/rusk\""
-
-# Neovim projects
-lilac     = "cd \"$DROPBOX/matrix/lilac\""
-mira      = "cd \"$DROPBOX/matrix/mira\""
-notio     = "cd \"$DROPBOX/matrix/nvim/notio\""
-
-[aliases.platform.mac]
-o         = "open ."
-
-[aliases.platform.linux]
-o         = "xdg-open ."
-
-[aliases.platform.wsl]
-o         = "explorer.exe ."
-
-[aliases.host.nimbus]
-nvidia    = "nvidia-smi"
-gpustats  = "watch -n1 nvidia-smi"
+script    = "$XDG_CONFIG_HOME/apogee/hooks/after-core-linux.sh"
