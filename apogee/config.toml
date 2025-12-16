@@ -151,14 +151,15 @@ platforms = ["mac", "linux", "windows", "wsl", "other"]
 [modules.apps.git.detect.commands]
 any_of = ["git"]
 
-[modules.apps.git.detect.version]
+[modules.apps.git.detect.version.all]
+type = "command"
 command = "git"
 args = ["--version"]
 regex = "(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)"
 
 [modules.apps.git.emit.aliases]
 gs = "git status"
-lg = "lazygit"
+gcp = "git_commit_push"
 
 [modules.apps.git.emit.functions]
 files = ["$XDG_CONFIG_HOME/apogee/functions/git.sh"]
@@ -174,7 +175,8 @@ platforms = ["mac", "linux", "windows", "wsl", "other"]
 [modules.apps.eza.detect.commands]
 any_of = ["eza"]
 
-[modules.apps.eza.detect.version]
+[modules.apps.eza.detect.version.all]
+type = "command"
 command = "eza"
 args = ["--version"]
 regex = "(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)"
@@ -207,19 +209,15 @@ any_of = [
 ]
 
 [modules.apps.houdini.detect.version.mac]
-type  = "path_regex"
-# apogee will use the first matched path from detect.files.mac.any_of
-# then run this regex against that path to get the version.
+type = "path_regex"
 regex = "Houdini\\s*(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+).*\\.app$"
 
 [modules.apps.houdini.detect.version.linux]
-type  = "path_regex"
-# Typical installs are /opt/hfs20.5.456 or /opt/hfs19.5.716 etc
+type = "path_regex"
 regex = "hfs(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)$"
 
 [modules.apps.houdini.detect.version.windows]
-type  = "path_regex"
-# Often looks like .../Houdini 20.5.456 (folder)
+type = "path_regex"
 regex = "Houdini\\s*(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)$"
 
 
