@@ -140,25 +140,29 @@ enabled = true
 # git (CLI app)
 # ----------------------
 [modules.apps.git]
-enabled   = true
-kind      = "cli"
-platforms = ["mac", "linux", "windows", "wsl", "other"]
+enabled = true
+kind = "cli"
+
+# Optional (empty means all platforms)
+platforms = []
 
 [modules.apps.git.detect.commands]
 any_of = ["git"]
 
-[modules.apps.git.detect.version.all]
-type = "command"
-command = "git"
-args = ["--version"]
-regex = "(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)"
-
 [modules.apps.git.emit.aliases]
-gs = "git status"
+# keep what you already have
+gs  = "git status"
 gcp = "git_commit_push"
 
+# add these once the functions exist
+mb  = "merge_branch"
+gbp = "git_blob_push"
+
 [modules.apps.git.emit.functions]
-files = ["{xdg_config_home}/apogee/functions/git.sh"]
+files = [
+  "{config_dir}/functions/git.{shell_ext}",
+  "{config_dir}/functions/git.{shell_family_ext}",
+]
 
 # ----------------------
 # eza (CLI app)
@@ -179,11 +183,41 @@ regex = "(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)"
 
 [modules.apps.eza.emit.env]
 USE_EZA = "1"
+EZA_CONFIG_DIR = "{home}/.config/eza"
+APOGEE_LS_ICONS = "0"
+APOGEE_DOTFILES_SGR = "90"
 
-[modules.apps.eza.emit.aliases]
-ls = "eza"
-ll = "eza -l"
-la = "eza -la"
+[modules.apps.eza.emit.functions]
+files = [
+  "{config_dir}/functions/eza.{shell_ext}",
+  "{config_dir}/functions/eza.{shell_family_ext}",
+]
+
+# ----------------------
+# cargo / rust (CLI toolchain)
+# ----------------------
+[modules.apps.cargo]
+enabled = true
+kind = "cli"
+platforms = ["mac", "linux", "windows", "wsl", "other"]
+
+# cargo detection
+[modules.apps.cargo.detect.commands]
+any_of = ["cargo"]
+
+# PATH: prefer CARGO_HOME if present, else ~/.cargo/bin
+# (apogee currently checks existence of the expanded string at emit time)
+[modules.apps.cargo.emit.paths]
+prepend_if_exists = [
+  "{home}/.cargo/bin",
+  "{userprofile}/.cargo/bin",
+  "/mnt/c/Users/{username}/.cargo/bin",
+]
+append_if_exists = []
+
+# keep cargo build artifacts out of Dropbox by default
+[modules.apps.cargo.emit.env]
+CARGO_TARGET_DIR = "{home}/.cache/cargo/targets"
 
 # ----------------------
 # Houdini (desktop app example)
