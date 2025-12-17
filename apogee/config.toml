@@ -27,31 +27,27 @@
 [apogee]
 schema_version = 2
 
-default_shell  = "zsh"          # "zsh" | "bash" | "fish" | "pwsh"
+default_shell  = "zsh"
 platforms      = ["mac", "linux", "windows", "wsl", "other"]
 
-# Secrets should follow the resolved config location.
-# (If you prefer XDG-based secrets, set this back to "$XDG_CONFIG_HOME/apogee/secrets.env")
+# apogee reads these (in order) and merges into runtime env map:
+env_file       = "{config_dir}/.env"
 secrets_file   = "{config_dir}/secrets.env"
 
-# --------------------------------
-# Bootstrap (read-time only)
-# --------------------------------
 [apogee.bootstrap.defaults.env]
-# Only applied if missing in the process env.
 XDG_CONFIG_HOME = "{home}/.config"
 XDG_CACHE_HOME  = "{home}/.cache"
 XDG_DATA_HOME   = "{home}/.local/share"
 XDG_STATE_HOME  = "{home}/.local/state"
 
 [apogee.bootstrap.secrets]
-# If a secret key already exists in the process env, keep it.
 strategy = "fill_missing" # "fill_missing" | "override"
 
 [modules]
 enable_cloud = true
 enable_apps  = true
 enable_hooks = true
+
 
 # ===================================================================
 # GLOBAL (platform/shell only)
@@ -78,9 +74,10 @@ o = "explorer.exe ."
 [modules.cloud]
 enabled = true
 
-# ----------------------
-# Dropbox (cloud storage)
-# ----------------------
+# ===================================================================
+# Dropbox
+# ===================================================================
+
 [modules.cloud.dropbox]
 enabled   = true
 kind      = "storage"
@@ -88,26 +85,24 @@ platforms = ["mac", "linux", "windows", "wsl", "other"]
 
 [modules.cloud.dropbox.detect.paths.mac]
 any_of = [
-  "$HOME/Library/CloudStorage/Dropbox",
-  "$HOME/Dropbox",
+  "{home}/Library/CloudStorage/Dropbox",
+  "{home}/Dropbox",
 ]
 
 [modules.cloud.dropbox.detect.paths.linux]
-any_of = ["$HOME/Dropbox"]
+any_of = ["{home}/Dropbox"]
 
 [modules.cloud.dropbox.detect.paths.windows]
-any_of = [
-  "$USERPROFILE/Dropbox",
-]
+any_of = ["{userprofile}/Dropbox"]
 
 [modules.cloud.dropbox.detect.paths.wsl]
 any_of = [
-  "$USERPROFILE/Dropbox",
-  "/mnt/c/Users/$USERNAME/Dropbox",
+  "{userprofile}/Dropbox",
+  "/mnt/c/Users/{username}/Dropbox",
 ]
 
 [modules.cloud.dropbox.detect.paths.other]
-any_of = ["$HOME/Dropbox"]
+any_of = ["{home}/Dropbox"]
 
 [modules.cloud.dropbox.emit.env]
 DROPBOX = "{detect.path}"
@@ -116,6 +111,7 @@ DROPBOX = "{detect.path}"
 MATRIX   = "$DROPBOX/matrix"
 PACKAGES = "$MATRIX/packages"
 CRATES   = "$MATRIX/crates"
+DOCKER   = "$MATRIX/docker"
 
 [modules.cloud.dropbox.emit.aliases]
 matrix   = "cd \"$MATRIX\""
@@ -162,7 +158,7 @@ gs = "git status"
 gcp = "git_commit_push"
 
 [modules.apps.git.emit.functions]
-files = ["$XDG_CONFIG_HOME/apogee/functions/git.sh"]
+files = ["{xdg_config_home}/apogee/functions/git.sh"]
 
 # ----------------------
 # eza (CLI app)
@@ -204,9 +200,7 @@ any_of = ["/Applications/Houdini*.app"]
 any_of = ["/opt/hfs*"]
 
 [modules.apps.houdini.detect.files.windows]
-any_of = [
-  "C:/Program Files/Side Effects Software/Houdini*"
-]
+any_of = ["C:/Program Files/Side Effects Software/Houdini*"]
 
 [modules.apps.houdini.detect.version.mac]
 type = "path_regex"
@@ -220,9 +214,6 @@ regex = "hfs(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)$"
 type = "path_regex"
 regex = "Houdini\\s*(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)$"
 
-
-[modules.apps.houdini.emit.env]
-
 # ===================================================================
 # MODULES: HOOKS
 # ===================================================================
@@ -235,7 +226,7 @@ name      = "after-core-mac"
 enabled   = true
 platforms = ["mac"]
 shells    = ["zsh", "bash"]
-script    = "$XDG_CONFIG_HOME/apogee/hooks/after-core-mac.sh"
+script    = "{xdg_config_home}/apogee/hooks/after-core-mac.sh"
 
 [[modules.hooks.items]]
 name      = "after-core-linux"
@@ -243,4 +234,4 @@ enabled   = true
 platforms = ["linux"]
 hosts     = ["nimbus", "flicker", "nexus"]
 shells    = ["zsh", "bash"]
-script    = "$XDG_CONFIG_HOME/apogee/hooks/after-core-linux.sh"
+script    = "{xdg_config_home}/apogee/hooks/after-core-linux.sh"
