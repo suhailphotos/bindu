@@ -30,7 +30,6 @@ schema_version = 2
 default_shell  = "zsh"
 platforms      = ["mac", "linux", "windows", "wsl", "other"]
 
-# apogee reads these (in order) and merges into runtime env map:
 env_file       = "{config_dir}/.env"
 secrets_file   = "{config_dir}/secrets.env"
 
@@ -43,10 +42,11 @@ XDG_STATE_HOME  = "{home}/.local/state"
 [apogee.bootstrap.secrets]
 strategy = "fill_missing" # "fill_missing" | "override"
 
+
 [modules]
 enable_cloud = true
 enable_apps  = true
-enable_hooks = true
+enable_hooks = false
 
 
 # ===================================================================
@@ -67,6 +67,7 @@ o = "explorer.exe ."
 [global.aliases.platform.wsl]
 o = "explorer.exe ."
 
+
 # ===================================================================
 # MODULES: CLOUD
 # ===================================================================
@@ -74,10 +75,9 @@ o = "explorer.exe ."
 [modules.cloud]
 enabled = true
 
-# ===================================================================
-# Dropbox
-# ===================================================================
-
+# -------------------------------------------------------------------
+# dropbox  (Orbit: DROPBOX/MATRIX/DOCKER/BASE_DIR/PACKAGES/CRATES/OBSIDIAN)
+# -------------------------------------------------------------------
 [modules.cloud.dropbox]
 enabled   = true
 kind      = "storage"
@@ -109,9 +109,11 @@ DROPBOX = "{detect.path}"
 
 [modules.cloud.dropbox.emit.env_derived]
 MATRIX   = "$DROPBOX/matrix"
+DOCKER   = "$MATRIX/docker"
+BASE_DIR = "$MATRIX/shellscripts"
 PACKAGES = "$MATRIX/packages"
 CRATES   = "$MATRIX/crates"
-DOCKER   = "$MATRIX/docker"
+OBSIDIAN = "$MATRIX/obsidian/jnanaKosha"
 
 [modules.cloud.dropbox.emit.aliases]
 matrix   = "cd \"$MATRIX\""
@@ -129,6 +131,43 @@ rusk     = "cd \"$DROPBOX/matrix/crates/rusk\""
 prepend_if_exists = ["$DROPBOX/matrix/bin"]
 append_if_exists  = []
 
+
+# -------------------------------------------------------------------
+# dataLib  (your corrected paths)
+# -------------------------------------------------------------------
+[modules.cloud.dataLib]
+enabled   = true
+kind      = "storage"
+platforms = ["mac", "linux", "windows", "wsl", "other"]
+
+[modules.cloud.dataLib.detect.paths.mac]
+any_of = [
+  "{home}/Library/CloudStorage/SynologyDrive-dataLib",
+  "{home}/SynologyDrive-dataLib",
+]
+
+[modules.cloud.dataLib.detect.paths.linux]
+any_of = ["/mnt/SynologyDrive-dataLib"]
+
+[modules.cloud.dataLib.detect.paths.windows]
+any_of = ["{userprofile}/SynologyDrive-dataLib"]
+
+[modules.cloud.dataLib.detect.paths.wsl]
+any_of = [
+  "{userprofile}/SynologyDrive-dataLib",
+  "/mnt/c/Users/{username}/SynologyDrive-dataLib",
+]
+
+[modules.cloud.dataLib.detect.paths.other]
+any_of = ["{home}/SynologyDrive-dataLib"]
+
+[modules.cloud.dataLib.emit.env]
+DATALIB = "{detect.path}"
+
+[modules.cloud.dataLib.emit.env_derived]
+ML4VFX = "$DATALIB/threeD/courses/05_Machine_Learning_in_VFX"
+
+
 # ===================================================================
 # MODULES: APPS
 # ===================================================================
@@ -136,33 +175,78 @@ append_if_exists  = []
 [modules.apps]
 enabled = true
 
+# --------------------------------------------------
+# core_userpaths (Orbit: ~/.local/bin)
+# --------------------------------------------------
+[modules.apps.core_userpaths]
+enabled   = true
+kind      = "cli"
+platforms = ["mac", "linux", "wsl", "other", "windows"]
+
+[modules.apps.core_userpaths.emit.paths]
+prepend_if_exists = ["{home}/.local/bin"]
+append_if_exists  = []
+
+
+# --------------------------------------------------
+# core_homebrew (mac baseline PATH)
+# --------------------------------------------------
+[modules.apps.core_homebrew]
+enabled   = true
+kind      = "cli"
+platforms = ["mac"]
+
+[modules.apps.core_homebrew.detect.paths.mac]
+any_of = ["/opt/homebrew/bin"]
+
+[modules.apps.core_homebrew.emit.paths]
+prepend_if_exists = [
+  "{detect.path}",        # /opt/homebrew/bin
+  "/opt/homebrew/sbin",
+]
+append_if_exists = []
+
+
+# --------------------------------------------------
+# core_editor (no scripts, no hooks)
+# Priority: nvim -> vim -> vi (first present wins)
+# --------------------------------------------------
+[modules.apps.core_editor]
+enabled = true
+kind = "cli"
+platforms = []
+
+[modules.apps.core_editor.detect.commands]
+any_of = ["nvim", "vim", "vi"]
+
+[modules.apps.core_editor.emit.env]
+EDITOR     = "{detect.command}"
+VISUAL     = "{detect.command}"
+GIT_EDITOR = "{detect.command}"
+
+
 # ----------------------
 # git (CLI app)
 # ----------------------
 [modules.apps.git]
 enabled = true
 kind = "cli"
-
-# Optional (empty means all platforms)
 platforms = []
 
 [modules.apps.git.detect.commands]
 any_of = ["git"]
 
 [modules.apps.git.emit.aliases]
-# keep what you already have
 gs  = "git status"
 gcp = "git_commit_push"
-
-# add these once the functions exist
 mb  = "merge_branch"
 gbp = "git_blob_push"
 
 [modules.apps.git.emit.functions]
 files = [
-  "{config_dir}/functions/git.{shell_ext}",
   "{config_dir}/functions/git.{shell_family_ext}",
 ]
+
 
 # ----------------------
 # eza (CLI app)
@@ -182,16 +266,16 @@ args = ["--version"]
 regex = "(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)"
 
 [modules.apps.eza.emit.env]
-USE_EZA = "1"
-EZA_CONFIG_DIR = "{home}/.config/eza"
-APOGEE_LS_ICONS = "0"
+USE_EZA            = "1"
+EZA_CONFIG_DIR     = "{home}/.config/eza"
+APOGEE_LS_ICONS    = "0"
 APOGEE_DOTFILES_SGR = "90"
 
 [modules.apps.eza.emit.functions]
 files = [
-  "{config_dir}/functions/eza.{shell_ext}",
   "{config_dir}/functions/eza.{shell_family_ext}",
 ]
+
 
 # ----------------------
 # cargo / rust (CLI toolchain)
@@ -201,71 +285,65 @@ enabled = true
 kind = "cli"
 platforms = ["mac", "linux", "windows", "wsl", "other"]
 
-# cargo detection
 [modules.apps.cargo.detect.commands]
 any_of = ["cargo"]
 
-# PATH: prefer CARGO_HOME if present, else ~/.cargo/bin
-# (apogee currently checks existence of the expanded string at emit time)
-[modules.apps.cargo.emit.paths]
-prepend_if_exists = [
-  "{home}/.cargo/bin",
-  "{userprofile}/.cargo/bin",
-  "/mnt/c/Users/{username}/.cargo/bin",
-]
-append_if_exists = []
-
-# keep cargo build artifacts out of Dropbox by default
 [modules.apps.cargo.emit.env]
 CARGO_TARGET_DIR = "{home}/.cache/cargo/targets"
 
+
 # ----------------------
-# Houdini (desktop app example)
+# starship (prompt)
 # ----------------------
-[modules.apps.houdini]
-enabled   = false
-kind      = "desktop"
-platforms = ["mac", "linux", "windows"]
+[modules.apps.starship]
+enabled = true
+kind = "cli"
+platforms = ["mac", "linux", "windows", "wsl", "other"]
 
-[modules.apps.houdini.detect.files.mac]
-any_of = ["/Applications/Houdini*.app"]
+[modules.apps.starship.detect.commands]
+any_of = ["starship"]
 
-[modules.apps.houdini.detect.files.linux]
-any_of = ["/opt/hfs*"]
+[[modules.apps.starship.emit.init]]
+command = "{detect.command_path}"
+args = ["init", "{shell_init}"]
+pwsh_out_string = false
 
-[modules.apps.houdini.detect.files.windows]
-any_of = ["C:/Program Files/Side Effects Software/Houdini*"]
 
-[modules.apps.houdini.detect.version.mac]
-type = "path_regex"
-regex = "Houdini\\s*(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+).*\\.app$"
+# ----------------------
+# zoxide (smarter cd)
+# ----------------------
+[modules.apps.zoxide]
+enabled = true
+kind = "cli"
+platforms = ["mac", "linux", "windows", "wsl", "other"]
 
-[modules.apps.houdini.detect.version.linux]
-type = "path_regex"
-regex = "hfs(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)$"
+[modules.apps.zoxide.detect.commands]
+any_of = ["zoxide"]
 
-[modules.apps.houdini.detect.version.windows]
-type = "path_regex"
-regex = "Houdini\\s*(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)$"
+[[modules.apps.zoxide.emit.init]]
+command = "{detect.command_path}"
+args = ["init", "{shell_init}"]
+pwsh_out_string = true
+
 
 # ===================================================================
-# MODULES: HOOKS
+# MODULES: HOOKS (disabled by default)
 # ===================================================================
 
 [modules.hooks]
-enabled = true
+enabled = false
 
-[[modules.hooks.items]]
-name      = "after-core-mac"
-enabled   = true
-platforms = ["mac"]
-shells    = ["zsh", "bash"]
-script    = "{xdg_config_home}/apogee/hooks/after-core-mac.sh"
+# [[modules.hooks.items]]
+# name      = "after-core-mac"
+# enabled   = true
+# platforms = ["mac"]
+# shells    = ["zsh", "bash"]
+# script    = "{xdg_config_home}/apogee/hooks/after-core-mac.sh"
 
-[[modules.hooks.items]]
-name      = "after-core-linux"
-enabled   = true
-platforms = ["linux"]
-hosts     = ["nimbus", "flicker", "nexus"]
-shells    = ["zsh", "bash"]
-script    = "{xdg_config_home}/apogee/hooks/after-core-linux.sh"
+# [[modules.hooks.items]]
+# name      = "after-core-linux"
+# enabled   = true
+# platforms = ["linux"]
+# hosts     = ["nimbus", "flicker", "nexus"]
+# shells    = ["zsh", "bash"]
+# script    = "{xdg_config_home}/apogee/hooks/after-core-linux.sh"
