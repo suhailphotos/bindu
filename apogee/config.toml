@@ -183,6 +183,22 @@ enabled   = true
 kind      = "cli"
 platforms = ["mac", "linux", "wsl", "other", "windows"]
 
+[modules.apps.core_userpaths.detect.paths.mac]
+any_of = ["{home}/.local/bin"]
+
+[modules.apps.core_userpaths.detect.paths.linux]
+any_of = ["{home}/.local/bin"]
+
+[modules.apps.core_userpaths.detect.paths.wsl]
+any_of = ["{home}/.local/bin"]
+
+[modules.apps.core_userpaths.detect.paths.other]
+any_of = ["{home}/.local/bin"]
+
+# (optional) if you ever want it on native Windows too:
+[modules.apps.core_userpaths.detect.paths.windows]
+any_of = ["{userprofile}/.local/bin"]
+
 [modules.apps.core_userpaths.emit.paths]
 prepend_if_exists = ["{home}/.local/bin"]
 append_if_exists  = []
