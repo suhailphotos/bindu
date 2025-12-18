@@ -143,23 +143,23 @@ platforms = ["mac", "linux", "windows", "wsl", "other"]
 [modules.cloud.dataLib.detect.paths.mac]
 any_of = [
   "{home}/Library/CloudStorage/SynologyDrive-dataLib",
-  "{home}/SynologyDrive-dataLib",
+  "{home}/dataLib",
 ]
 
 [modules.cloud.dataLib.detect.paths.linux]
-any_of = ["/mnt/SynologyDrive-dataLib"]
+any_of = ["/mnt/dataLib"]
 
 [modules.cloud.dataLib.detect.paths.windows]
-any_of = ["{userprofile}/SynologyDrive-dataLib"]
+any_of = ["{userprofile}/dataLib"]
 
 [modules.cloud.dataLib.detect.paths.wsl]
 any_of = [
-  "{userprofile}/SynologyDrive-dataLib",
-  "/mnt/c/Users/{username}/SynologyDrive-dataLib",
+  "{userprofile}/dataLib",
+  "/mnt/c/Users/{username}/dataLib",
 ]
 
 [modules.cloud.dataLib.detect.paths.other]
-any_of = ["{home}/SynologyDrive-dataLib"]
+any_of = ["{home}/dataLib"]
 
 [modules.cloud.dataLib.emit.env]
 DATALIB = "{detect.path}"
@@ -325,6 +325,79 @@ command = "{detect.command_path}"
 args = ["init", "{shell_init}"]
 pwsh_out_string = true
 
+# --------------------------------------------------
+# pixi (CLI toolchain)
+# Orbit: PIXI_HOME + PATH + host-manifest helpers
+# --------------------------------------------------
+[modules.apps.pixi]
+enabled   = true
+kind      = "cli"
+platforms = ["mac", "linux", "windows", "wsl", "other"]
+
+[modules.apps.pixi.detect.paths.mac]
+any_of = ["{home}/.pixi"]
+
+[modules.apps.pixi.detect.paths.linux]
+any_of = ["{home}/.pixi"]
+
+[modules.apps.pixi.detect.paths.windows]
+any_of = ["{userprofile}/.pixi"]
+
+[modules.apps.pixi.detect.paths.wsl]
+any_of = [
+  "{home}/.pixi",
+  "/mnt/c/Users/{username}/.pixi",
+]
+
+[modules.apps.pixi.detect.paths.other]
+any_of = ["{home}/.pixi"]
+
+[modules.apps.pixi.emit.env]
+PIXI_HOME = "{detect.path}"
+
+[modules.apps.pixi.emit.paths]
+prepend_if_exists = ["$PIXI_HOME/bin"]
+append_if_exists  = []
+
+[modules.apps.pixi.emit.env_derived]
+PIXIH_HOST_TRACKED = "{xdg_config_home}/pixi/hosts/{host}/.pixi/manifests/pixi-global.toml"
+PIXIH_LIVE_LINK    = "$PIXI_HOME/manifests/pixi-global.toml"
+
+[modules.apps.pixi.emit.functions]
+files = [
+  "{config_dir}/functions/pixi.{shell_family_ext}",
+]
+
+
+# --------------------------------------------------
+# uv (python tooling)
+# --------------------------------------------------
+[modules.apps.uv]
+enabled   = true
+kind      = "cli"
+platforms = ["mac", "linux", "windows", "wsl", "other"]
+
+[modules.apps.uv.detect.commands]
+any_of = ["uv"]
+
+[modules.apps.uv.emit.env]
+# Apogee-managed knobs (replacing ORBIT_* names)
+APOGEE_UV_VENV_ROOT   = "{home}/.venvs"
+APOGEE_UV_DEFAULT_PY  = "auto-houdini"
+
+# uv’s own locations (keep the same defaults you used)
+UV_TOOL_DIR      = "{home}/.local/share/uv/tools"
+UV_TOOL_BIN_DIR  = "{home}/.local/share/uv/bin"
+
+[modules.apps.uv.emit.paths]
+prepend_if_exists = ["$UV_TOOL_BIN_DIR"]
+append_if_exists  = []
+
+[modules.apps.uv.emit.functions]
+files = [
+  "{config_dir}/functions/uv.{shell_ext}",
+  "{config_dir}/functions/uv.{shell_family_ext}",
+]
 
 # ===================================================================
 # MODULES: HOOKS (disabled by default)
