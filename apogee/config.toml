@@ -167,6 +167,54 @@ DATALIB = "{detect.path}"
 [modules.cloud.dataLib.emit.env_derived]
 ML4VFX = "$DATALIB/threeD/courses/05_Machine_Learning_in_VFX"
 
+# -------------------------------------------------------------------
+# nebula_ai (ZFS share from zion; only active when mounted)
+# -------------------------------------------------------------------
+[modules.cloud.nebula_ai]
+enabled   = true
+kind      = "storage"
+platforms = ["mac", "linux", "windows", "wsl", "other"]
+
+[modules.cloud.nebula_ai.detect.paths.mac]
+any_of = [
+  "/Volumes/ai",
+  "/Volumes/nebula_ai",
+]
+
+[modules.cloud.nebula_ai.detect.paths.linux]
+any_of = [
+  "/mnt/ai",
+  "/mnt/nebula_ai",
+]
+
+[modules.cloud.nebula_ai.detect.paths.wsl]
+any_of = [
+  "/mnt/z/ai",
+  "/mnt/z/nebula_ai",
+]
+
+[modules.cloud.nebula_ai.detect.paths.windows]
+any_of = [
+  "Z:\\ai",
+  "Z:\\nebula_ai",
+]
+
+[modules.cloud.nebula_ai.detect.paths.other]
+any_of = [
+  "{home}/ai",
+]
+
+[modules.cloud.nebula_ai.emit.env]
+NEBULA_AI_ROOT = "{detect.path}"
+
+[modules.cloud.nebula_ai.emit.env_derived]
+NEBULA_AI_MODELS       = "$NEBULA_AI_ROOT/models"
+NEBULA_AI_DATASETS     = "$NEBULA_AI_ROOT/datasets"
+NEBULA_AI_EXPERIMENTS  = "$NEBULA_AI_ROOT/experiments"
+NEBULA_AI_LOGS         = "$NEBULA_AI_ROOT/logs"
+NEBULA_AI_SCRIPTS      = "$NEBULA_AI_ROOT/scripts"
+NEBULA_AI_PROJECTS     = "$NEBULA_AI_ROOT/projects"
+
 
 # ===================================================================
 # MODULES: APPS
@@ -176,11 +224,61 @@ ML4VFX = "$DATALIB/threeD/courses/05_Machine_Learning_in_VFX"
 enabled = true
 
 # --------------------------------------------------
+# core_homebrew (mac baseline PATH)
+# --------------------------------------------------
+[modules.apps.core_homebrew]
+enabled   = true
+kind      = "cli"
+platforms = ["mac"]
+priority = 10
+
+[modules.apps.core_homebrew.detect.paths.mac]
+any_of = ["/opt/homebrew/bin"]
+
+[modules.apps.core_homebrew.emit.paths]
+prepend_if_exists = [
+  "{detect.path}",        # /opt/homebrew/bin
+  "/opt/homebrew/sbin",
+]
+append_if_exists = []
+
+# --------------------------------------------------
+# linux_homebrew (linux baseline PATH, cross-shell)
+# --------------------------------------------------
+[modules.apps.linux_homebrew]
+enabled   = true
+kind      = "cli"
+priority  = 12
+platforms = ["linux", "wsl"]
+
+[modules.apps.linux_homebrew.detect.paths.linux]
+any_of = [
+  "/home/linuxbrew/.linuxbrew/bin",
+  "{home}/.linuxbrew/bin",
+]
+
+[modules.apps.linux_homebrew.detect.paths.wsl]
+any_of = [
+  "/home/linuxbrew/.linuxbrew/bin",
+  "{home}/.linuxbrew/bin",
+]
+
+[modules.apps.linux_homebrew.emit.paths]
+prepend_if_exists = [
+  "/home/linuxbrew/.linuxbrew/bin",
+  "/home/linuxbrew/.linuxbrew/sbin",
+  "{home}/.linuxbrew/bin",
+  "{home}/.linuxbrew/sbin",
+]
+append_if_exists = []
+
+# --------------------------------------------------
 # core_userpaths (Orbit: ~/.local/bin)
 # --------------------------------------------------
 [modules.apps.core_userpaths]
 enabled   = true
 kind      = "cli"
+priority  = 20
 platforms = ["mac", "linux", "wsl", "other", "windows"]
 
 [modules.apps.core_userpaths.detect.paths.mac]
@@ -203,33 +301,28 @@ any_of = ["{userprofile}/.local/bin"]
 prepend_if_exists = ["{home}/.local/bin"]
 append_if_exists  = []
 
-
 # --------------------------------------------------
-# core_homebrew (mac baseline PATH)
+# terminfo_dirs (cross-shell baseline)
 # --------------------------------------------------
-[modules.apps.core_homebrew]
+[modules.apps.terminfo_dirs]
 enabled   = true
 kind      = "cli"
-platforms = ["mac"]
+priority  = 25
+platforms = ["mac", "linux", "windows", "wsl", "other"]
 
-[modules.apps.core_homebrew.detect.paths.mac]
-any_of = ["/opt/homebrew/bin"]
-
-[modules.apps.core_homebrew.emit.paths]
-prepend_if_exists = [
-  "{detect.path}",        # /opt/homebrew/bin
-  "/opt/homebrew/sbin",
-]
-append_if_exists = []
+[modules.apps.terminfo_dirs.emit.env]
+TERMINFO_DIRS = "{home}/.terminfo:/usr/share/terminfo"
 
 
 # --------------------------------------------------
 # core_editor (no scripts, no hooks)
 # Priority: nvim -> vim -> vi (first present wins)
 # --------------------------------------------------
+
 [modules.apps.core_editor]
 enabled = true
 kind = "cli"
+priority = 30
 platforms = []
 
 [modules.apps.core_editor.detect.commands]
@@ -247,6 +340,7 @@ GIT_EDITOR = "{detect.command}"
 [modules.apps.git]
 enabled = true
 kind = "cli"
+priority = 40
 platforms = []
 
 [modules.apps.git.detect.commands]
@@ -270,6 +364,7 @@ files = [
 [modules.apps.eza]
 enabled   = true
 kind      = "cli"
+priority = 50
 platforms = ["mac", "linux", "windows", "wsl", "other"]
 
 [modules.apps.eza.detect.commands]
@@ -299,6 +394,7 @@ files = [
 [modules.apps.cargo]
 enabled = true
 kind = "cli"
+priority = 60
 platforms = ["mac", "linux", "windows", "wsl", "other"]
 
 [modules.apps.cargo.detect.commands]
@@ -314,6 +410,7 @@ CARGO_TARGET_DIR = "{home}/.cache/cargo/targets"
 [modules.apps.starship]
 enabled = true
 kind = "cli"
+priority = 70
 platforms = ["mac", "linux", "windows", "wsl", "other"]
 
 [modules.apps.starship.detect.commands]
@@ -331,6 +428,7 @@ pwsh_out_string = false
 [modules.apps.zoxide]
 enabled = true
 kind = "cli"
+priority = 80
 platforms = ["mac", "linux", "windows", "wsl", "other"]
 
 [modules.apps.zoxide.detect.commands]
@@ -348,6 +446,7 @@ pwsh_out_string = true
 [modules.apps.pixi]
 enabled   = true
 kind      = "cli"
+priority = 90
 platforms = ["mac", "linux", "windows", "wsl", "other"]
 
 [modules.apps.pixi.detect.paths.mac]
@@ -391,6 +490,7 @@ files = [
 [modules.apps.uv]
 enabled   = true
 kind      = "cli"
+priority = 100
 platforms = ["mac", "linux", "windows", "wsl", "other"]
 
 [modules.apps.uv.detect.commands]
@@ -414,6 +514,60 @@ files = [
   "{config_dir}/functions/uv.{shell_ext}",
   "{config_dir}/functions/uv.{shell_family_ext}",
 ]
+
+# --------------------------------------------------
+# fzf
+# --------------------------------------------------
+[modules.apps.fzf]
+enabled = true
+priority = 120
+kind = "cli"
+
+[modules.apps.fzf.detect.commands]
+any_of = ["fzf"]
+
+[modules.apps.fzf.emit.source]
+files = [
+  "/opt/homebrew/opt/fzf/shell/completion.{shell}",
+  "/opt/homebrew/opt/fzf/shell/key-bindings.{shell}",
+  "/usr/local/opt/fzf/shell/completion.{shell}",
+  "/usr/local/opt/fzf/shell/key-bindings.{shell}",
+  "{home}/.fzf/shell/completion.{shell}",
+  "{home}/.fzf/shell/key-bindings.{shell}",
+]
+
+# --------------------------------------------------
+# ripgrep (rg)
+# --------------------------------------------------
+[modules.apps.ripgrep]
+enabled  = true
+priority = 130
+kind     = "cli"
+
+[modules.apps.ripgrep.detect.commands]
+any_of = ["rg"]
+
+[modules.apps.ripgrep.emit.env]
+RIPGREP_CONFIG_PATH = "{xdg_config_home}/ripgrep/ripgreprc"
+
+[modules.apps.ripgrep.emit.aliases]
+rgi = "rg --hidden --follow"
+rgv = "rg --hidden --follow --glob '!**/.git/*'"
+
+# --------------------------------------------------
+# fd (pairs with the shared ignore file)
+# --------------------------------------------------
+[modules.apps.fd]
+enabled  = true
+priority = 135
+kind     = "cli"
+
+[modules.apps.fd.detect.commands]
+any_of = ["fd", "fdfind"]
+
+[modules.apps.fd.emit.env]
+FD_OPTIONS = "--hidden --ignore-file={xdg_config_home}/search/ignore"
+
 
 # ===================================================================
 # MODULES: HOOKS (disabled by default)
