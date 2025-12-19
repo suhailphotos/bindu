@@ -1,5 +1,5 @@
 # apogee: eza helpers (bash/zsh)
-command -v eza >/dev/null 2>&1 || return
+command -v eza >/dev/null 2>&1 || return 0
 
 : "${APOGEE_LS_ICONS:=0}"
 : "${APOGEE_DOTFILES_SGR:=90}"
@@ -10,15 +10,15 @@ _apogee_eza_common_flags() {
   if [[ "${APOGEE_LS_ICONS}" == "1" ]]; then
     flags+=" --icons=auto"
   fi
-  print -r -- "$flags"
+  printf '%s\n' "$flags"
 }
 
 _apogee_eza_colors_prefix() {
   local dotrule=".*=${APOGEE_DOTFILES_SGR}"
   if [[ -n "${EZA_COLORS:-}" ]]; then
-    print -r -- "${dotrule}:${EZA_COLORS}"
+    printf '%s\n' "${dotrule}:${EZA_COLORS}"
   else
-    print -r -- "${dotrule}"
+    printf '%s\n' "${dotrule}"
   fi
 }
 
