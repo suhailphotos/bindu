@@ -46,8 +46,8 @@ strategy = "fill_missing" # "fill_missing" | "override"
 [modules]
 enable_cloud = true
 enable_apps  = true
-enable_hooks = false
-
+enable_hooks = true
+enable_templates = true
 
 # ===================================================================
 # GLOBAL (platform/shell only)
@@ -76,7 +76,7 @@ o = "explorer.exe ."
 enabled = true
 
 # -------------------------------------------------------------------
-# dropbox  (Orbit: DROPBOX/MATRIX/DOCKER/BASE_DIR/PACKAGES/CRATES/OBSIDIAN)
+# dropbox  (DROPBOX/MATRIX/DOCKER/BASE_DIR/PACKAGES/CRATES/OBSIDIAN)
 # -------------------------------------------------------------------
 [modules.cloud.dropbox]
 enabled   = true
@@ -416,6 +416,9 @@ platforms = ["mac", "linux", "windows", "wsl", "other"]
 [modules.apps.starship.detect.commands]
 any_of = ["starship"]
 
+[modules.apps.starship.emit.env]
+STARSHIP_CONFIG = "{xdg_config_home}/starship/starship_{shell}.toml"
+
 [[modules.apps.starship.emit.init]]
 command = "{detect.command_path}"
 args = ["init", "{shell_init}"]
@@ -490,18 +493,22 @@ files = [
 [modules.apps.uv]
 enabled   = true
 kind      = "cli"
-priority = 100
+priority  = 100
 platforms = ["mac", "linux", "windows", "wsl", "other"]
 
 [modules.apps.uv.detect.commands]
 any_of = ["uv"]
 
 [modules.apps.uv.emit.env]
-# Apogee-managed knobs (replacing ORBIT_* names)
-APOGEE_UV_VENV_ROOT   = "{home}/.venvs"
-APOGEE_UV_DEFAULT_PY  = "auto-houdini"
+# Apogee-managed knobs (these feed python_env.*)
+APOGEE_UV_VENV_ROOT        = "{home}/.venvs"
+APOGEE_UV_DEFAULT_PY       = "auto-houdini"
+APOGEE_UV_QUIET            = "0"
+APOGEE_UV_SYNC_ON_ACTIVATE = "0"
+APOGEE_UV_FORCE_SYNC       = "0"
+APOGEE_USE_CONDA           = "0"
 
-# uv’s own locations (keep the same defaults you used)
+# uv’s own locations
 UV_TOOL_DIR      = "{home}/.local/share/uv/tools"
 UV_TOOL_BIN_DIR  = "{home}/.local/share/uv/bin"
 
@@ -511,8 +518,7 @@ append_if_exists  = []
 
 [modules.apps.uv.emit.functions]
 files = [
-  "{config_dir}/functions/uv.{shell_ext}",
-  "{config_dir}/functions/uv.{shell_family_ext}",
+  "{config_dir}/functions/python_env.{shell_ext}",
 ]
 
 # --------------------------------------------------
@@ -568,25 +574,109 @@ any_of = ["fd", "fdfind"]
 [modules.apps.fd.emit.env]
 FD_OPTIONS = "--hidden --ignore-file={xdg_config_home}/search/ignore"
 
+# ===================================================================
+# MODULES: TEMPLATES
+# ===================================================================
+
+[modules.templates]
+enabled = true
+
+[modules.templates.python_projects]
+enabled  = true
+priority = 200
+
+# Require uv, and (optionally) dropbox if your template references PACKAGES/MATRIX etc.
+requires = ["apps.uv", "cloud.dropbox"]
+
+[modules.templates.python_projects.templates]
+zsh  = "{config_dir}/templates/python_projects.zsh.j2"
+bash = "{config_dir}/templates/python_projects.bash.j2"
+fish = "{config_dir}/templates/python_projects.fish.j2"
+pwsh = "{config_dir}/templates/python_projects.pwsh.j2"
+
+[modules.templates.python_projects.data]
+projects = [
+  { name = "hdrUtils",       kind = "uv" },
+  { name = "helperScripts",  kind = "uv" },
+  { name = "Incept",         kind = "uv" },
+  { name = "Ledu",           kind = "uv" },
+  { name = "Lumiera",        kind = "uv" },
+  { name = "notionManager",  kind = "uv" },
+  { name = "oauthManager",   kind = "uv" },
+  { name = "ocioTools",      kind = "uv" },
+  { name = "pariVaha",       kind = "uv" },
+  { name = "pythonKitchen",  kind = "uv" },
+  { name = "webUtils",       kind = "uv" },
+]
+
+# ===================================================================
+# Desktop apps
+# ===================================================================
+
+# -------------------------------------------------------------------
+# Blender
+# -------------------------------------------------------------------
+[modules.apps.blender]
+enabled = true
+
+[modules.apps.blender.detect.paths.mac]
+any_of = ["/Applications/Blender.app"]
+
+[modules.apps.blender.detect.version.mac]
+# single method is still valid
+type = "mac_bundle_plist"
+path = "{detect.path}"
+key = "CFBundleShortVersionString"
+regex = "(?P<version>\\d+\\.\\d+(?:\\.\\d+)?)"
+
+[modules.apps.blender.emit.env]
+BLENDER_VERSION = "{detect.version}"
+
+# -------------------------------------------------------------------
+# Houdini
+# -------------------------------------------------------------------
+[modules.apps.houdini]
+enabled   = true
+kind      = "desktop"
+priority  = 160
+platforms = ["mac", "linux", "wsl"]
+
+[modules.apps.houdini.detect.paths.mac]
+any_of = ["/Applications/Houdini/Houdini*"]
+
+[modules.apps.houdini.detect.paths.linux]
+any_of = ["/opt/hfs*"]
+
+[modules.apps.houdini.detect.paths.wsl]
+any_of = ["/opt/hfs*"]
+
+[modules.apps.houdini.detect.version.all]
+type = "path_regex"
+regex = "(?:Houdini|hfs)(?P<version>[0-9]+\\.[0-9]+\\.[0-9]+)"
+capture = "version"
+
+[modules.apps.houdini.emit.env]
+APOGEE_HAS_HOUDINI          = "1"
+APOGEE_HOUDINI_DETECT_PATH  = "{detect.path}"
+APOGEE_HOUDINI_DETECT_VERSION = "{detect.version}"
+
+[modules.apps.houdini.emit.functions]
+files = [
+  "{config_dir}/functions/houdini.{shell_family_ext}",
+]
 
 # ===================================================================
 # MODULES: HOOKS (disabled by default)
 # ===================================================================
 
 [modules.hooks]
-enabled = false
+enabled = true
 
-# [[modules.hooks.items]]
-# name      = "after-core-mac"
-# enabled   = true
-# platforms = ["mac"]
-# shells    = ["zsh", "bash"]
-# script    = "{xdg_config_home}/apogee/hooks/after-core-mac.sh"
 
-# [[modules.hooks.items]]
-# name      = "after-core-linux"
-# enabled   = true
-# platforms = ["linux"]
-# hosts     = ["nimbus", "flicker", "nexus"]
-# shells    = ["zsh", "bash"]
-# script    = "{xdg_config_home}/apogee/hooks/after-core-linux.sh"
+[[modules.hooks.items]]
+name = "noop"
+enabled = true
+platforms = []
+hosts = []
+shells = []
+script = "{config_dir}/hooks/noop.{shell_ext}"

@@ -1,0 +1,14 @@
+# python_projects template (pwsh)
+# PACKAGES from runtime: {{ vars.PACKAGES | default(value="(missing)") }}
+
+function python_projects {
+  @(
+{% for p in data.projects -%}
+    {{ p.name | tojson }}
+{% endfor -%}
+  )
+}
+
+{% for p in data.projects %}
+function {{ p.name }} { pkg {{ p.name | tojson }} }
+{% endfor %}

@@ -1,0 +1,15 @@
+# python_projects template (fish)
+# PACKAGES from runtime: {{ vars.PACKAGES | default(value="(missing)") }}
+
+function python_projects
+{% for p in data.projects %}
+  echo {{ p.name | tojson }}
+{% endfor %}
+end
+
+{% for p in data.projects %}
+function {{ p.name }}
+  pkg {{ p.name | tojson }}
+end
+
+{% endfor %}

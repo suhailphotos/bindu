@@ -1,0 +1,14 @@
+# python_projects template (zsh)
+# PACKAGES from runtime: {{ vars.PACKAGES | default(value="(missing)") }}
+
+python_projects() {
+  cat <<'EOF'
+{% for p in data.projects -%}
+{{ p.name }}
+{% endfor -%}
+EOF
+}
+
+{% for p in data.projects %}
+{{ p.name }}() { pkg {{ p.name | tojson }}; }
+{% endfor %}
