@@ -114,6 +114,7 @@ BASE_DIR = "$MATRIX/shellscripts"
 PACKAGES = "$MATRIX/packages"
 CRATES   = "$MATRIX/crates"
 OBSIDIAN = "$MATRIX/obsidian/jnanaKosha"
+CREDENTIALS_PATH = "$MATRIX/config/credentials"
 
 [modules.cloud.dropbox.emit.aliases]
 matrix   = "cd \"$MATRIX\""
@@ -224,13 +225,13 @@ NEBULA_AI_PROJECTS     = "$NEBULA_AI_ROOT/projects"
 enabled = true
 
 # --------------------------------------------------
-# core_homebrew (mac baseline PATH)
+# core_homebrew (mac baseline PATH + brew shellenv)
 # --------------------------------------------------
 [modules.apps.core_homebrew]
 enabled   = true
 kind      = "cli"
 platforms = ["mac"]
-priority = 10
+priority  = 10
 
 [modules.apps.core_homebrew.detect.paths.mac]
 any_of = ["/opt/homebrew/bin"]
@@ -241,6 +242,28 @@ prepend_if_exists = [
   "/opt/homebrew/sbin",
 ]
 append_if_exists = []
+
+[[modules.apps.core_homebrew.emit.init]]
+command = "brew"
+args = ["shellenv"]
+pwsh_out_string = true
+
+# --------------------------------------------------
+# bat (MANPAGER)
+# --------------------------------------------------
+[modules.apps.bat]
+enabled   = true
+kind      = "cli"
+priority  = 145
+platforms = ["mac", "linux", "wsl", "other", "windows"]
+
+[modules.apps.bat.detect.commands]
+any_of = ["bat", "batcat"]
+
+# Prefer bat if present (keeps man pages readable and colored)
+[modules.apps.bat.emit.env]
+MANPAGER = "sh -c 'col -bx | bat -l man -p'"
+
 
 # --------------------------------------------------
 # linux_homebrew (linux baseline PATH, cross-shell)
@@ -334,6 +357,28 @@ VISUAL     = "{detect.command}"
 GIT_EDITOR = "{detect.command}"
 
 
+# -------------------------------------------------------------------
+# core_macos_paths
+# -------------------------------------------------------------------
+[modules.apps.core_macos_paths]
+enabled   = true
+kind      = "cli"
+priority  = 5
+platforms = ["mac"]
+
+# no detect needed? (but your system requires detect to activate)
+# so: activate if /usr/bin exists (always true on mac)
+[modules.apps.core_macos_paths.detect.paths.mac]
+any_of = ["/usr/bin"]
+
+[modules.apps.core_macos_paths.emit.paths]
+prepend_if_exists = [
+  "/usr/local/bin",
+  "/usr/local/sbin",
+]
+append_if_exists = []
+
+
 # ----------------------
 # git (CLI app)
 # ----------------------
@@ -357,6 +402,20 @@ files = [
   "{config_dir}/functions/git.{shell_family_ext}",
 ]
 
+# -------------------------------------------------------------------
+# 1Password CLI
+# -------------------------------------------------------------------
+[modules.apps.onepassword]
+enabled  = true
+kind     = "cli"
+priority = 95
+platforms = ["mac", "linux", "windows", "wsl", "other"]
+
+[modules.apps.onepassword.detect.commands]
+any_of = ["op"]
+
+[modules.apps.onepassword.emit.env]
+OP_CACHE = "true"
 
 # ----------------------
 # eza (CLI app)
@@ -402,6 +461,34 @@ any_of = ["cargo"]
 
 [modules.apps.cargo.emit.env]
 CARGO_TARGET_DIR = "{home}/.cache/cargo/targets"
+
+# --------------------------------------------------
+# pyenv (optional)
+# --------------------------------------------------
+[modules.apps.pyenv]
+enabled   = true
+kind      = "cli"
+priority  = 110
+platforms = ["mac", "linux", "wsl", "other"]
+
+[modules.apps.pyenv.detect.paths.mac]
+any_of = ["{home}/.pyenv"]
+
+[modules.apps.pyenv.detect.paths.linux]
+any_of = ["{home}/.pyenv"]
+
+[modules.apps.pyenv.detect.paths.wsl]
+any_of = ["{home}/.pyenv"]
+
+[modules.apps.pyenv.detect.paths.other]
+any_of = ["{home}/.pyenv"]
+
+[modules.apps.pyenv.emit.env]
+PYENV_ROOT = "{detect.path}"
+
+[modules.apps.pyenv.emit.paths]
+prepend_if_exists = ["$PYENV_ROOT/bin"]
+append_if_exists  = []
 
 
 # ----------------------
@@ -480,6 +567,7 @@ append_if_exists  = []
 [modules.apps.pixi.emit.env_derived]
 PIXIH_HOST_TRACKED = "{xdg_config_home}/pixi/hosts/{host}/.pixi/manifests/pixi-global.toml"
 PIXIH_LIVE_LINK    = "$PIXI_HOME/manifests/pixi-global.toml"
+PIXI_GLOBAL_FEATURES = "{platform}"
 
 [modules.apps.pixi.emit.functions]
 files = [
@@ -532,14 +620,23 @@ kind = "cli"
 [modules.apps.fzf.detect.commands]
 any_of = ["fzf"]
 
+# KEY BINDINGS via fzf itself
+[[modules.apps.fzf.emit.init]]
+shells  = ["zsh", "bash", "fish"]
+command = "{detect.command_path}"
+args    = ["--{shell}"]
+
+# Optional: completion only (no key-bindings files here)
 [modules.apps.fzf.emit.source]
 files = [
   "/opt/homebrew/opt/fzf/shell/completion.{shell}",
-  "/opt/homebrew/opt/fzf/shell/key-bindings.{shell}",
   "/usr/local/opt/fzf/shell/completion.{shell}",
-  "/usr/local/opt/fzf/shell/key-bindings.{shell}",
   "{home}/.fzf/shell/completion.{shell}",
-  "{home}/.fzf/shell/key-bindings.{shell}",
+]
+
+[modules.apps.fzf.emit.functions]
+files = [
+  "{config_dir}/functions/fzf.{shell_family_ext}",
 ]
 
 # --------------------------------------------------
@@ -664,6 +761,40 @@ APOGEE_HOUDINI_DETECT_VERSION = "{detect.version}"
 files = [
   "{config_dir}/functions/houdini.{shell_family_ext}",
 ]
+
+# -------------------------------------------------------------------
+# Nuke (Foundry) - desktop
+# NOTE: current glob resolver can't match wildcards in parent dirs,
+# so include explicit paths for now.
+# -------------------------------------------------------------------
+[modules.apps.nuke]
+enabled   = true
+kind      = "desktop"
+priority  = 170
+platforms = ["mac"]
+
+[modules.apps.nuke.detect.paths.mac]
+any_of = [
+  # If installed directly as an .app
+  "/Applications/Nuke*.app",
+
+  # Common Foundry layout (explicit example for your current default)
+  "/Applications/Nuke16.0v6/Nuke16.0v6.app",
+]
+
+[modules.apps.nuke.detect.version.mac]
+type = "mac_bundle_plist"
+path = "{detect.path}"
+key  = "CFBundleShortVersionString"
+regex = "(?P<version>\\d+\\.\\d+(?:\\.\\d+)?)"
+
+[modules.apps.nuke.emit.env]
+APOGEE_HAS_NUKE       = "1"
+APOGEE_NUKE_DETECT_PATH = "{detect.path}"
+APOGEE_NUKE_VERSION   = "{detect.version}"
+
+# Your current preference (keep this if you still want a "default")
+APOGEE_NUKE_DEFAULT   = "Nuke16.0v6"
 
 # ===================================================================
 # MODULES: HOOKS (disabled by default)

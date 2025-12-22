@@ -130,8 +130,8 @@ style                  = 'fg:path_default'
 # Character
 # ----------
 [character]
-success_symbol = '[%](bold fg:ok)'
-error_symbol   = '[%](bold fg:err)'
+success_symbol = '[❯](bold fg:ok)'
+error_symbol   = '[❯](bold fg:err)'
 
 # --------------------
 # Status
