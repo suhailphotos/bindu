@@ -216,6 +216,25 @@ NEBULA_AI_LOGS         = "$NEBULA_AI_ROOT/logs"
 NEBULA_AI_SCRIPTS      = "$NEBULA_AI_ROOT/scripts"
 NEBULA_AI_PROJECTS     = "$NEBULA_AI_ROOT/projects"
 
+# --------------------------------------------------
+# scratch_paths (mac-only, local convenience paths)
+# --------------------------------------------------
+[modules.cloud.scratch_paths]
+enabled   = true
+kind      = "storage"
+platforms = ["mac"]
+
+# Activate only if at least one of these exists
+[modules.cloud.scratch_paths.detect.paths.mac]
+any_of = [
+  "{home}/Documents/Scratch"
+]
+
+# Emit them regardless; if you want strictness per-path, see note below
+[modules.cloud.scratch_paths.emit.env]
+projexp = "{home}/Documents/Scratch/exports"
+scrcap  = "{home}/Documents/Scratch/screenshots"
+
 
 # ===================================================================
 # MODULES: APPS
@@ -331,7 +350,19 @@ append_if_exists  = []
 enabled   = true
 kind      = "cli"
 priority  = 25
-platforms = ["mac", "linux", "windows", "wsl", "other"]
+platforms = ["mac", "linux", "wsl", "other"]
+
+[modules.apps.terminfo_dirs.detect.paths.mac]
+any_of = ["/usr/bin"]
+
+[modules.apps.terminfo_dirs.detect.paths.linux]
+any_of = ["/usr/bin"]
+
+[modules.apps.terminfo_dirs.detect.paths.wsl]
+any_of = ["/usr/bin"]
+
+[modules.apps.terminfo_dirs.detect.paths.other]
+any_of = ["/usr/bin"]
 
 [modules.apps.terminfo_dirs.emit.env]
 TERMINFO_DIRS = "{home}/.terminfo:/usr/share/terminfo"
@@ -508,7 +539,7 @@ STARSHIP_CONFIG = "{xdg_config_home}/starship/starship_{shell}.toml"
 
 [modules.apps.starship.emit.source]
 files = [
-  "{config_dir}/functions/starship_root_override.{shell}"
+  "{config_dir}/functions/starship_root_override.{shell_ext}"
 ]
 
 [[modules.apps.starship.emit.init]]
@@ -633,9 +664,9 @@ args    = ["--{shell}"]
 # Optional: completion only (no key-bindings files here)
 [modules.apps.fzf.emit.source]
 files = [
-  "/opt/homebrew/opt/fzf/shell/completion.{shell}",
-  "/usr/local/opt/fzf/shell/completion.{shell}",
-  "{home}/.fzf/shell/completion.{shell}",
+  "/opt/homebrew/opt/fzf/shell/completion.{shell_ext}",
+  "/usr/local/opt/fzf/shell/completion.{shell_ext}",
+  "{home}/.fzf/shell/completion.{shell_ext}",
 ]
 
 [modules.apps.fzf.emit.functions]
@@ -674,6 +705,41 @@ any_of = ["fd", "fdfind"]
 
 [modules.apps.fd.emit.env]
 FD_OPTIONS = "--hidden --ignore-file={xdg_config_home}/search/ignore"
+
+# --------------------------------------------------
+# clipboard (pbcopy/pbpaste cross platform)
+# --------------------------------------------------
+[modules.apps.clipboard]
+enabled   = true
+kind      = "cli"
+priority  = 150
+platforms = ["mac", "linux", "windows", "wsl", "other"]
+
+# Activate if *any* backend exists (or on pwsh we still want it)
+[modules.apps.clipboard.detect.commands]
+any_of = ["pbcopy", "wl-copy", "xclip", "xsel", "clip.exe", "powershell.exe", "pwsh", "powershell"]
+
+[modules.apps.clipboard.emit.functions]
+files = [
+  "{config_dir}/functions/clipboard.{shell_ext}",
+]
+
+# --------------------------------------------------
+# yazi (cd on exit helper)
+# --------------------------------------------------
+[modules.apps.yazi]
+enabled   = true
+kind      = "cli"
+priority  = 140
+platforms = ["mac", "linux", "wsl", "other"]
+
+[modules.apps.yazi.detect.commands]
+any_of = ["yazi"]
+
+[modules.apps.yazi.emit.functions]
+files = [
+  "{config_dir}/functions/yazi.{shell_ext}",
+]
 
 # ===================================================================
 # MODULES: TEMPLATES
