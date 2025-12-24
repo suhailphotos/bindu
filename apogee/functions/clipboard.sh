@@ -1,4 +1,4 @@
-# If we already have pbcopy/pbpaste (mac), don't override.
+# If mac already has pbcopy/pbpaste, do not override.
 command -v pbcopy >/dev/null 2>&1 && command -v pbpaste >/dev/null 2>&1 && return 0
 
 _have() { command -v "$1" >/dev/null 2>&1; }

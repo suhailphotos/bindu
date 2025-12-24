@@ -343,6 +343,26 @@ any_of = ["{userprofile}/.local/bin"]
 prepend_if_exists = ["{home}/.local/bin"]
 append_if_exists  = []
 
+
+# --------------------------------------------------
+# terminfo helpers (push/check terminfo on remote)
+# --------------------------------------------------
+[modules.apps.terminfo]
+enabled   = true
+kind      = "cli"
+priority  = 26
+platforms = ["mac", "linux", "windows", "wsl", "other"]
+
+# Only enable when the required tools exist
+[modules.apps.terminfo.detect.commands]
+any_of = ["infocmp", "tic", "ssh"]
+
+[modules.apps.terminfo.emit.functions]
+files = [
+  "{config_dir}/functions/terminfo.{shell_family_ext}",
+]
+
+
 # --------------------------------------------------
 # terminfo_dirs (cross-shell baseline)
 # --------------------------------------------------
@@ -721,8 +741,27 @@ any_of = ["pbcopy", "wl-copy", "xclip", "xsel", "clip.exe", "powershell.exe", "p
 
 [modules.apps.clipboard.emit.functions]
 files = [
-  "{config_dir}/functions/clipboard.{shell_ext}",
+  "{config_dir}/functions/clipboard.{shell_family_ext}",
 ]
+
+# --------------------------------------------------
+# tmux_seg (fast STARSHIP_TMUX_SEG; no starship custom spawning)
+# --------------------------------------------------
+[modules.apps.tmux_seg]
+enabled   = true
+kind      = "cli"
+priority  = 75
+platforms = ["mac", "linux", "windows", "wsl", "other"]
+
+# only install the hook if tmux exists on the machine
+[modules.apps.tmux_seg.detect.commands]
+any_of = ["tmux"]
+
+[modules.apps.tmux_seg.emit.functions]
+files = [
+  "{config_dir}/functions/tmux_seg.{shell_ext}",
+]
+
 
 # --------------------------------------------------
 # yazi (cd on exit helper)
@@ -841,14 +880,16 @@ files = [
 enabled   = true
 kind      = "desktop"
 priority  = 170
-platforms = ["mac"]
+platforms = ["mac", "linux", "windows", "wsl", "other"]
+
+# Activate if the CLI exists (common on linux/win setups),
+# OR if the mac app is present (your explicit path still works).
+[modules.apps.nuke.detect.commands]
+any_of = ["nuke"]
 
 [modules.apps.nuke.detect.paths.mac]
 any_of = [
-  # If installed directly as an .app
   "/Applications/Nuke*.app",
-
-  # Common Foundry layout (explicit example for your current default)
   "/Applications/Nuke16.0v6/Nuke16.0v6.app",
 ]
 
@@ -859,12 +900,16 @@ key  = "CFBundleShortVersionString"
 regex = "(?P<version>\\d+\\.\\d+(?:\\.\\d+)?)"
 
 [modules.apps.nuke.emit.env]
-APOGEE_HAS_NUKE       = "1"
+APOGEE_HAS_NUKE         = "1"
 APOGEE_NUKE_DETECT_PATH = "{detect.path}"
-APOGEE_NUKE_VERSION   = "{detect.version}"
+APOGEE_NUKE_VERSION     = "{detect.version}"
+APOGEE_NUKE_DEFAULT     = "Nuke16.0v6"
 
-# Your current preference (keep this if you still want a "default")
-APOGEE_NUKE_DEFAULT   = "Nuke16.0v6"
+[modules.apps.nuke.emit.functions]
+files = [
+  "{config_dir}/functions/nuke.{shell_family_ext}",
+]
+
 
 # ===================================================================
 # MODULES: HOOKS (disabled by default)
