@@ -4,6 +4,8 @@
 return {
   "nvim-treesitter/nvim-treesitter",
   build = ":TSUpdate",
+  -- In the new version, we simply pass the table to 'opts'.
+  -- lazy.nvim will handle the initialization for us.
   opts = {
     ensure_installed = {
       -- core
@@ -18,11 +20,13 @@ return {
       "dockerfile", "gitignore", "tmux",
     },
     sync_install = false,
-    auto_install = false,  -- <— no background downloads. Turn on if you want auto download
-    highlight = { enable = true, additional_vim_regex_highlighting = { "markdown" } },
+    auto_install = false,
+    highlight = {
+      enable = true,
+      additional_vim_regex_highlighting = { "markdown" }
+    },
     indent = { enable = true },
   },
-  config = function(_, opts)
-    require("nvim-treesitter.configs").setup(opts)
-  end,
+  -- The 'config' function is removed because require("nvim-treesitter.configs")
+  -- no longer exists in the latest version of the plugin.
 }
