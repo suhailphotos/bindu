@@ -212,6 +212,7 @@ any_of = [
 
 [modules.cloud.nebula_ai.emit.env]
 NEBULA_AI_ROOT = "{detect.path}"
+NEBULA_AI_MOUNTED = "1"
 
 [modules.cloud.nebula_ai.emit.env_derived]
 NEBULA_AI_MODELS       = "$NEBULA_AI_ROOT/models"
@@ -649,6 +650,49 @@ files = [
   "{config_dir}/functions/pixi.{shell_family_ext}",
 ]
 
+# --------------------------------------------------
+# conda (Anaconda/Miniconda)
+# --------------------------------------------------
+[modules.apps.conda]
+enabled = true
+kind = "cli"
+priority = 101
+platforms = ["mac", "linux", "windows", "wsl", "other"]
+
+[modules.apps.conda.detect.paths.linux]
+any_of = ["{home}/anaconda3", "{home}/miniconda3"]
+
+[modules.apps.conda.detect.paths.mac]
+any_of = ["{home}/anaconda3", "{home}/miniconda3"]
+
+[modules.apps.conda.detect.paths.windows]
+any_of = ["{userprofile}/anaconda3", "{userprofile}/miniconda3"]
+
+[modules.apps.conda.emit.source]
+files = [
+  "{config_dir}/functions/conda_lazy.{shell_family_ext}"
+]
+
+# --------------------------------------------------
+# Cuda
+# --------------------------------------------------
+[modules.apps.cuda]
+enabled   = true
+kind      = "cli"
+priority  = 66
+platforms = ["linux", "wsl"]
+
+[modules.apps.cuda.detect.paths.linux]
+any_of = ["/usr/local/cuda"]
+
+[modules.apps.cuda.emit.env]
+CUDA_HOME = "{detect.path}"
+LD_LIBRARY_PATH = "$CUDA_HOME/lib64:${LD_LIBRARY_PATH:-}"
+
+[modules.apps.cuda.emit.paths]
+prepend_if_exists = ["$CUDA_HOME/bin"]
+append_if_exists  = []
+
 
 # --------------------------------------------------
 # uv (python tooling)
@@ -702,19 +746,31 @@ any_of = ["fzf"]
 # Source completion + key-bindings (correct way)
 [modules.apps.fzf.emit.source]
 files = [
-  # Homebrew mac
+  # -----------------------------
+  # Ubuntu/Debian package paths
+  # -----------------------------
+
+  # Newer-ish layouts (often under /usr/share/fzf)
+  "/usr/share/fzf/shell/completion.{shell_ext}",
+  "/usr/share/fzf/shell/key-bindings.{shell_ext}",
+
+  # Older layouts (sometimes directly under /usr/share/fzf)
+  "/usr/share/fzf/completion.{shell_ext}",
+  "/usr/share/fzf/key-bindings.{shell_ext}",
+
+  # Doc examples (common on Debian/Ubuntu)
+  "/usr/share/doc/fzf/examples/completion.{shell_ext}",
+  "/usr/share/doc/fzf/examples/key-bindings.{shell_ext}",
+
+  # -----------------------------
+  # Homebrew / Linuxbrew / user installs (already cross-shell)
+  # -----------------------------
   "/opt/homebrew/opt/fzf/shell/completion.{shell_ext}",
   "/opt/homebrew/opt/fzf/shell/key-bindings.{shell_ext}",
-
-  # Intel brew mac
   "/usr/local/opt/fzf/shell/completion.{shell_ext}",
   "/usr/local/opt/fzf/shell/key-bindings.{shell_ext}",
-
-  # Linuxbrew (common)
   "/home/linuxbrew/.linuxbrew/opt/fzf/shell/completion.{shell_ext}",
   "/home/linuxbrew/.linuxbrew/opt/fzf/shell/key-bindings.{shell_ext}",
-
-  # .fzf install
   "{home}/.fzf/shell/completion.{shell_ext}",
   "{home}/.fzf/shell/key-bindings.{shell_ext}",
 ]
