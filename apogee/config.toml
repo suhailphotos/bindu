@@ -60,11 +60,11 @@ XDG_CONFIG_HOME = "{home}/.config"
 
 [global.aliases.platform.mac]
 o     = "open ."
-bindu = "cd $XDG_CONFIG_HOME"
+bindu = "cd {xdg_config_home}"
 
 [global.aliases.platform.linux]
 o = "xdg-open ."
-bindu = "cd $XDG_CONFIG_HOME"
+bindu = "cd {xdg_config_home}"
 
 [global.aliases.platform.windows]
 o = "explorer.exe ."
@@ -659,17 +659,8 @@ kind      = "cli"
 priority  = 100
 platforms = ["mac", "linux", "windows", "wsl", "other"]
 
-[modules.apps.uv.detect.paths.mac]
-any_of = ["{home}/.local/share/uv/bin"]
-
-[modules.apps.uv.detect.paths.linux]
-any_of = ["{home}/.local/share/uv/bin"]
-
-[modules.apps.uv.detect.paths.wsl]
-any_of = ["{home}/.local/share/uv/bin"]
-
-[modules.apps.uv.detect.paths.other]
-any_of = ["{home}/.local/share/uv/bin"]
+[modules.apps.uv.detect.commands]
+any_of = ["uv"]
 
 [modules.apps.uv.emit.env]
 # Apogee-managed knobs (these feed python_env.*)
@@ -685,8 +676,12 @@ UV_TOOL_DIR      = "{home}/.local/share/uv/tools"
 UV_TOOL_BIN_DIR  = "{home}/.local/share/uv/bin"
 
 [modules.apps.uv.emit.paths]
-prepend_if_exists = ["$UV_TOOL_BIN_DIR"]
-append_if_exists  = []
+prepend_if_exists = [
+  "$UV_TOOL_BIN_DIR",
+  "{home}/.local/share/uv/bin",
+]
+append_if_exists = []
+
 
 [modules.apps.uv.emit.functions]
 files = [
@@ -920,6 +915,7 @@ any_of = ["nuke"]
 any_of = [
   "/Applications/Nuke*.app",
   "/Applications/Nuke16.0v6/Nuke16.0v6.app",
+  "/Applications/Nuke16.0v8/Nuke16.0v8.app",
 ]
 
 [modules.apps.nuke.detect.version.mac]
