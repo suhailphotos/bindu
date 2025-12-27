@@ -14,11 +14,6 @@ function _nukeutils_root
     return 1
 end
 
-function _nukeutils_normalize_version
-    set -l v $argv[1]
-    echo (string replace -r '^Nuke' '' -- $v)
-end
-
 function _nukeutils_prepend_nuke_path
     set -l entry $argv[1]
     if not set -q NUKE_PATH
@@ -33,31 +28,30 @@ function _nukeutils_prepend_nuke_path
 end
 
 function _nukeutils_launch
-    set -l edition (set -q NUKE_EDITION; and echo $NUKE_EDITION; or echo Nuke)
-    set -l vin ""
-
-    if set -q NUKE_VERSION
-        set vin $NUKE_VERSION
-    else if set -q APOGEE_NUKE_VERSION
-        set vin $APOGEE_NUKE_VERSION
-    else if set -q APOGEE_NUKE_DEFAULT
-        set vin $APOGEE_NUKE_DEFAULT
-    end
-
-    set -l v (_nukeutils_normalize_version $vin)
-
+    # Prefer CLI if available
     if type -q nuke
         nuke $argv
         return $status
     end
 
+    # macOS: prefer Apogee's detected .app path
     if type -q open
-        set -l app $edition
-        if test -n "$v"
-            set app "$edition$v"
+        if set -q APOGEE_NUKE_DETECT_PATH; and test -d "$APOGEE_NUKE_DETECT_PATH"
+            open -a "$APOGEE_NUKE_DETECT_PATH" --args $argv 2>/dev/null
+            or open -a "$APOGEE_NUKE_DETECT_PATH" 2>/dev/null
+            or begin
+                echo "Could not launch Nuke app: $APOGEE_NUKE_DETECT_PATH" >&2
+                return 1
+            end
+            return 0
         end
-        open -a $app --args $argv 2>/dev/null; or open -a $app 2>/dev/null; or begin
-            echo "Could not launch Nuke app: $app" >&2
+
+        # Best-effort fallback: by name only (no version guessing)
+        set -l edition (set -q NUKE_EDITION; and echo $NUKE_EDITION; or echo Nuke)
+        open -a $edition --args $argv 2>/dev/null
+        or open -a $edition 2>/dev/null
+        or begin
+            echo "Could not launch Nuke app: $edition (and no APOGEE_NUKE_DETECT_PATH)" >&2
             return 1
         end
         return 0

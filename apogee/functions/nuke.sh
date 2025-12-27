@@ -40,32 +40,27 @@ _nukeutils_prepend_pathvar() {
   fi
 }
 
-_nukeutils_normalize_version() {
-  # Converts "Nuke16.0v6" -> "16.0v6"
-  v="$1"
-  v="${v#Nuke}"
-  printf '%s\n' "$v"
-}
-
 _nukeutils_launch() {
-  edition="${NUKE_EDITION:-Nuke}"                 # Nuke | NukeX | NukeStudio
-  v_in="${NUKE_VERSION:-${APOGEE_NUKE_VERSION:-${APOGEE_NUKE_DEFAULT:-}}}"
-
-  v="$(_nukeutils_normalize_version "$v_in")"
-
+  # Prefer CLI if available
   if command -v nuke >/dev/null 2>&1; then
     nuke "$@"
     return $?
   fi
 
-  # macOS app launch fallback
+  # macOS app launch fallback: prefer Apogee's detected .app path
   if command -v open >/dev/null 2>&1; then
-    app="$edition"
-    [ -n "$v" ] && app="${edition}${v}"
-    open -a "$app" --args "$@" 2>/dev/null || open -a "$app" 2>/dev/null || {
-      echo "Could not launch Nuke app: $app" >&2
-      return 1
-    }
+    if [ -n "${APOGEE_NUKE_DETECT_PATH:-}" ] && [ -d "${APOGEE_NUKE_DETECT_PATH:-}" ]; then
+      open -a "$APOGEE_NUKE_DETECT_PATH" --args "$@" 2>/dev/null \
+        || open -a "$APOGEE_NUKE_DETECT_PATH" 2>/dev/null \
+        || { echo "Could not launch Nuke app: $APOGEE_NUKE_DETECT_PATH" >&2; return 1; }
+      return 0
+    fi
+
+    # Best-effort fallback: by name only (no version guessing)
+    edition="${NUKE_EDITION:-Nuke}" # Nuke | NukeX | NukeStudio
+    open -a "$edition" --args "$@" 2>/dev/null \
+      || open -a "$edition" 2>/dev/null \
+      || { echo "Could not launch Nuke app: $edition (and no APOGEE_NUKE_DETECT_PATH)" >&2; return 1; }
     return 0
   fi
 

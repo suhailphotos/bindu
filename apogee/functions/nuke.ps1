@@ -33,11 +33,6 @@ function nukeUtils {
     return
   }
 
-  function Normalize-NukeVersion([string]$v) {
-    if (-not $v) { return "" }
-    return ($v -replace '^Nuke','')
-  }
-
   function Ensure-NukeEnv {
     if (-not $env:NUKE_USER_DIR) { $env:NUKE_USER_DIR = (Join-Path $HOME ".nuke") }
     New-Item -ItemType Directory -Force -Path $env:NUKE_USER_DIR | Out-Null
@@ -68,25 +63,27 @@ function nukeUtils {
   }
 
   function Launch-Nuke {
-    $edition = $env:NUKE_EDITION
-    if (-not $edition) { $edition = "Nuke" }
-
-    $vin = $env:NUKE_VERSION
-    if (-not $vin) { $vin = $env:APOGEE_NUKE_VERSION }
-    if (-not $vin) { $vin = $env:APOGEE_NUKE_DEFAULT }
-
-    $v = Normalize-NukeVersion $vin
-
+    # Prefer CLI if available
     if (Get-Command nuke -ErrorAction SilentlyContinue) {
       & nuke @Args
       return
     }
 
+    # macOS: prefer Apogee's detected .app path
     if ($IsMacOS -and (Get-Command open -ErrorAction SilentlyContinue)) {
-      $app = $edition
-      if ($v) { $app = "$edition$v" }
-      & open -a $app --args @Args 2>$null
-      if ($LASTEXITCODE -ne 0) { & open -a $app 2>$null }
+      $appPath = $env:APOGEE_NUKE_DETECT_PATH
+      if ($appPath -and (Test-Path $appPath)) {
+        & open -a $appPath --args @Args 2>$null
+        if ($LASTEXITCODE -ne 0) { & open -a $appPath 2>$null }
+        return
+      }
+
+      # Best-effort fallback: by name only (no version guessing)
+      $edition = $env:NUKE_EDITION
+      if (-not $edition) { $edition = "Nuke" }
+
+      & open -a $edition --args @Args 2>$null
+      if ($LASTEXITCODE -ne 0) { & open -a $edition 2>$null }
       return
     }
 
