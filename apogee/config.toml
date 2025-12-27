@@ -55,11 +55,16 @@ enable_templates = true
 
 [global]
 
+[global.env]
+XDG_CONFIG_HOME = "{home}/.config"
+
 [global.aliases.platform.mac]
-o = "open ."
+o     = "open ."
+bindu = "cd $XDG_CONFIG_HOME"
 
 [global.aliases.platform.linux]
 o = "xdg-open ."
+bindu = "cd $XDG_CONFIG_HOME"
 
 [global.aliases.platform.windows]
 o = "explorer.exe ."
@@ -125,7 +130,7 @@ orbit    = "cd \"$DROPBOX/matrix/orbit\""
 helix    = "cd \"$DROPBOX/matrix/helix\""
 tessera  = "cd \"$DROPBOX/matrix/tessera\""
 
-apogee   = "cd \"$DROPBOX/matrix/crates/apogee\""
+apogee_repo   = "cd \"$DROPBOX/matrix/crates/apogee\""
 rusk     = "cd \"$DROPBOX/matrix/crates/rusk\""
 
 [modules.cloud.dropbox.emit.paths]
@@ -407,6 +412,21 @@ EDITOR     = "{detect.command}"
 VISUAL     = "{detect.command}"
 GIT_EDITOR = "{detect.command}"
 
+# -------------------------------------------------------------------
+# nvim
+# -------------------------------------------------------------------
+[modules.apps.nvim_aliases]
+enabled   = true
+kind      = "cli"
+priority  = 31
+platforms = ["mac", "linux", "windows", "wsl", "other"]
+
+[modules.apps.nvim_aliases.detect.commands]
+any_of = ["nvim"]
+
+[modules.apps.nvim_aliases.emit.aliases]
+vi  = "nvim"
+vim = "nvim"
 
 # -------------------------------------------------------------------
 # core_macos_paths
@@ -639,8 +659,17 @@ kind      = "cli"
 priority  = 100
 platforms = ["mac", "linux", "windows", "wsl", "other"]
 
-[modules.apps.uv.detect.commands]
-any_of = ["uv"]
+[modules.apps.uv.detect.paths.mac]
+any_of = ["{home}/.local/share/uv/bin"]
+
+[modules.apps.uv.detect.paths.linux]
+any_of = ["{home}/.local/share/uv/bin"]
+
+[modules.apps.uv.detect.paths.wsl]
+any_of = ["{home}/.local/share/uv/bin"]
+
+[modules.apps.uv.detect.paths.other]
+any_of = ["{home}/.local/share/uv/bin"]
 
 [modules.apps.uv.emit.env]
 # Apogee-managed knobs (these feed python_env.*)
