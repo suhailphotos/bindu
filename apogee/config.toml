@@ -932,7 +932,6 @@ regex = "(?P<version>\\d+\\.\\d+(?:\\.\\d+)?)"
 APOGEE_HAS_NUKE         = "1"
 APOGEE_NUKE_DETECT_PATH = "{detect.path}"
 APOGEE_NUKE_VERSION     = "{detect.version}"
-APOGEE_NUKE_DEFAULT     = "Nuke16.0v6"
 
 [modules.apps.nuke.emit.functions]
 files = [

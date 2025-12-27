@@ -69,7 +69,10 @@ _nukeutils_launch() {
 }
 
 nukeUtils() {
-  cmd="${1:-}"; shift || true
+  cmd="${1:-}"
+  if [ $# -gt 0 ]; then
+    shift
+  fi
 
   # If you ever call this without the module active, keep it harmless.
   if [ "${APOGEE_HAS_NUKE:-0}" != "1" ] && ! command -v nuke >/dev/null 2>&1; then
