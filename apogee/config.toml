@@ -913,9 +913,7 @@ any_of = ["nuke"]
 
 [modules.apps.nuke.detect.paths.mac]
 any_of = [
-  "/Applications/Nuke*.app",
-  "/Applications/Nuke16.0v6/Nuke16.0v6.app",
-  "/Applications/Nuke16.0v8/Nuke16.0v8.app",
+  "/Applications/Nuke*/Nuke*.app",
 ]
 
 [modules.apps.nuke.detect.version.mac]
