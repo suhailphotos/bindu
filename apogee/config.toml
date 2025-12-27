@@ -699,18 +699,24 @@ kind = "cli"
 [modules.apps.fzf.detect.commands]
 any_of = ["fzf"]
 
-# KEY BINDINGS via fzf itself
-[[modules.apps.fzf.emit.init]]
-shells  = ["zsh", "bash", "fish"]
-command = "{detect.command_path}"
-args    = ["--{shell}"]
-
-# Optional: completion only (no key-bindings files here)
+# Source completion + key-bindings (correct way)
 [modules.apps.fzf.emit.source]
 files = [
+  # Homebrew mac
   "/opt/homebrew/opt/fzf/shell/completion.{shell_ext}",
+  "/opt/homebrew/opt/fzf/shell/key-bindings.{shell_ext}",
+
+  # Intel brew mac
   "/usr/local/opt/fzf/shell/completion.{shell_ext}",
+  "/usr/local/opt/fzf/shell/key-bindings.{shell_ext}",
+
+  # Linuxbrew (common)
+  "/home/linuxbrew/.linuxbrew/opt/fzf/shell/completion.{shell_ext}",
+  "/home/linuxbrew/.linuxbrew/opt/fzf/shell/key-bindings.{shell_ext}",
+
+  # .fzf install
   "{home}/.fzf/shell/completion.{shell_ext}",
+  "{home}/.fzf/shell/key-bindings.{shell_ext}",
 ]
 
 [modules.apps.fzf.emit.functions]
