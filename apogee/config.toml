@@ -124,13 +124,25 @@ CREDENTIALS_PATH = "$MATRIX/config/credentials"
 [modules.cloud.dropbox.emit.aliases]
 matrix   = "cd \"$MATRIX\""
 packages = "cd \"$PACKAGES\""
-crates   = "cd \"$CRATES\""
 
+# -------------------------------------------------------------------
+# cd {repo_name}
+# -------------------------------------------------------------------
 hatch    = "cd \"$DROPBOX/matrix/hatch\""
 orbit    = "cd \"$DROPBOX/matrix/orbit\""
 helix    = "cd \"$DROPBOX/matrix/helix\""
 tessera  = "cd \"$DROPBOX/matrix/tessera\""
 
+# -------------------------------------------------------------------
+# Docker Services
+# -------------------------------------------------------------------
+stem_serve = "cd \"$DROPBOX/matrix/docker/services/vortex/stem\""
+
+
+# -------------------------------------------------------------------
+# Cargo Crates
+# -------------------------------------------------------------------
+crates   = "cd \"$CRATES\""
 apogee_repo   = "cd \"$DROPBOX/matrix/crates/apogee\""
 rusk     = "cd \"$DROPBOX/matrix/crates/rusk\""
 
