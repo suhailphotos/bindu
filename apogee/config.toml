@@ -126,12 +126,14 @@ matrix   = "cd \"$MATRIX\""
 packages = "cd \"$PACKAGES\""
 crates   = "cd \"$CRATES\""
 
+hatch    = "cd \"$DROPBOX/matrix/hatch\""
 orbit    = "cd \"$DROPBOX/matrix/orbit\""
 helix    = "cd \"$DROPBOX/matrix/helix\""
 tessera  = "cd \"$DROPBOX/matrix/tessera\""
 
 apogee_repo   = "cd \"$DROPBOX/matrix/crates/apogee\""
 rusk     = "cd \"$DROPBOX/matrix/crates/rusk\""
+
 
 [modules.cloud.dropbox.emit.paths]
 prepend_if_exists = ["$DROPBOX/matrix/bin"]
