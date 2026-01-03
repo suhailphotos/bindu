@@ -63,6 +63,7 @@ format = "[$hostname]($style) "
 style = "fg:dim"
 
 [hostname.aliases]
+[hostname.aliases]
 feather = ""
 quasar  = "󰖨"
 nimbus  = ""
@@ -70,6 +71,9 @@ eclipse = ""
 flicker = ""
 nexus   = "󰴗"
 zion    = ""
+vortex  = "󰸳"
+stem    = ""
+neuron  = ""
 
 
 # ----------------------------
