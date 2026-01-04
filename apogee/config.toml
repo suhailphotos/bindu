@@ -732,6 +732,7 @@ APOGEE_USE_CONDA           = "0"
 # uv’s own locations
 UV_TOOL_DIR      = "{home}/.local/share/uv/tools"
 UV_TOOL_BIN_DIR  = "{home}/.local/share/uv/bin"
+UV_PYTHON_INSTALL_DIR = "{home}/.local/share/uv/python"
 
 [modules.apps.uv.emit.paths]
 prepend_if_exists = [
