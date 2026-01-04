@@ -212,6 +212,33 @@ _apogee_uv_activate_in_project() {
   . "$envroot/bin/activate"
 }
 
+# --- Prompt env name for Starship ------------------------------------------
+
+_apogee_set_prompt_py_env_name() {
+  # Prefer venv name
+  if [ -n "${VIRTUAL_ENV:-}" ]; then
+    export PROMPT_PY_ENV_NAME="$(basename "$VIRTUAL_ENV")"
+    return 0
+  fi
+
+  # Optional: show conda env too
+  if [ -n "${CONDA_DEFAULT_ENV:-}" ]; then
+    export PROMPT_PY_ENV_NAME="${CONDA_DEFAULT_ENV}"
+    return 0
+  fi
+
+  unset PROMPT_PY_ENV_NAME
+}
+
+# Keep it updated without clobbering existing PROMPT_COMMAND
+_apogee_install_pyname_hook() {
+  case ";${PROMPT_COMMAND:-};" in
+    *";_apogee_set_prompt_py_env_name;"*) ;;
+    *) PROMPT_COMMAND="_apogee_set_prompt_py_env_name; ${PROMPT_COMMAND:-}" ;;
+  esac
+}
+_apogee_install_pyname_hook
+
 # --- pkg ---------------------------------------------------------------------
 
 _apogee_pkg_root() {
