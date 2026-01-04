@@ -62,22 +62,13 @@ uv() {
 
 uvp() { printf '%s\n' "${UV_PROJECT_ENVIRONMENT:-(unset)}"; }
 
-# --- Python selection helpers -------------------------------------------------
+# --- Python selection helpers (project-first) -------------------------------
 
-_apogee_py_mm_to_num() {
-  # "3.11" -> 311  (simple compare)
-  local mm="$1"
-  local maj="${mm%%.*}"
-  local min="${mm#*.}"
-  printf '%d\n' "$((maj * 100 + min))"
-}
+_apogee_py_mm_to_num() { local mm="$1"; printf '%d\n' "$(( ${mm%%.*} * 100 + ${mm#*.} ))"; }
 
 _apogee_pyproject_requires_python() {
-  # Extract requires-python = ">=3.11.0,<4.0.0"
-  local root="$1"
-  local f="$root/pyproject.toml"
+  local root="$1" f="$root/pyproject.toml"
   [ -f "$f" ] || return 1
-
   awk -F= '
     $1 ~ /^[[:space:]]*requires-python[[:space:]]*$/ {
       gsub(/^[[:space:]]+|[[:space:]]+$/,"",$2);
@@ -89,119 +80,86 @@ _apogee_pyproject_requires_python() {
 }
 
 _apogee_requires_min_mm() {
-  # From ">=3.11.0,<4.0.0" -> "3.11"
   local spec="$1"
-  # find first >=X.Y
-  if printf '%s' "$spec" | grep -Eq '>=\s*[0-9]+\.[0-9]+'; then
-    printf '%s' "$spec" \
-      | sed -nE 's/.*>=\s*([0-9]+)\.([0-9]+).*/\1.\2/p' \
-      | head -n1
-    return 0
-  fi
-
-  # fallback: any X.Y
-  if printf '%s' "$spec" | grep -Eq '[0-9]+\.[0-9]+'; then
-    printf '%s' "$spec" \
-      | sed -nE 's/.*([0-9]+)\.([0-9]+).*/\1.\2/p' \
-      | head -n1
-    return 0
-  fi
-  return 1
+  printf '%s' "$spec" | sed -nE 's/.*>=\s*([0-9]+)\.([0-9]+).*/\1.\2/p' | head -n1
 }
 
 _apogee_houdini_python_mm() {
-  # Prefer hython if present; otherwise try detected path
   if command -v hython >/dev/null 2>&1; then
-    hython -c 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")' 2>/dev/null
-    return $?
+    hython -c 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")' 2>/dev/null && return 0
   fi
-
   if [ -n "${APOGEE_HOUDINI_DETECT_PATH:-}" ] && [ -x "${APOGEE_HOUDINI_DETECT_PATH}/bin/hython" ]; then
-    "${APOGEE_HOUDINI_DETECT_PATH}/bin/hython" -c 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")' 2>/dev/null
-    return $?
+    "${APOGEE_HOUDINI_DETECT_PATH}/bin/hython" -c 'import sys; print(f"{sys.version_info[0]}.{sys.version_info[1]}")' 2>/dev/null && return 0
   fi
-
   return 1
 }
 
 _apogee_uv_default_python_spec() {
   local mode="${APOGEE_UV_DEFAULT_PY:-auto-houdini}"
+
+  # Explicit version requested
   if [ -n "$mode" ] && [ "$mode" != "auto-houdini" ]; then
-    echo "$mode"
-    return 0
+    echo "$mode"; return 0
   fi
 
-  # auto-houdini: return Houdini major.minor if available
+  # auto-houdini: prefer Houdini major.minor if available
   local hou_mm=""
   hou_mm="$(_apogee_houdini_python_mm 2>/dev/null)" || true
   if [ -n "$hou_mm" ]; then
-    echo "$hou_mm"
-    return 0
+    echo "$hou_mm"; return 0
   fi
 
-  # fallback: system python3 if present, else "3"
-  command -v python3 >/dev/null 2>&1 && command -v python3 || echo "3"
+  # fallback
+  echo "3"
 }
 
 _apogee_uv_pick_python_for_project() {
   local root="$1"
 
-  # 1) explicit .python-version wins (uv-native)
+  # .python-version wins (uv-native)
   if [ -f "$root/.python-version" ]; then
-    # first token, trim whitespace/newlines
     tr -d '\r' < "$root/.python-version" | awk '{print $1; exit}'
     return 0
   fi
 
-  # 2) derive from requires-python if present
+  # derive from requires-python (pin major.minor)
   local req="" min_mm=""
   req="$(_apogee_pyproject_requires_python "$root" 2>/dev/null)" || true
   min_mm="$(_apogee_requires_min_mm "$req" 2>/dev/null)" || true
 
-  # 3) auto-houdini default, but only if it satisfies min requirement (when known)
   local def="" def_mm=""
   def="$(_apogee_uv_default_python_spec)"
   def_mm="$def"
 
+  # If we know the minimum, ensure we meet it
   if [ -n "$min_mm" ]; then
-    # If default is a path (python3), just use min_mm
-    if printf '%s' "$def" | grep -Eq '^[0-9]+\.[0-9]+$'; then
+    if printf '%s' "$def_mm" | grep -Eq '^[0-9]+\.[0-9]+$'; then
       if [ "$(_apogee_py_mm_to_num "$def_mm")" -ge "$(_apogee_py_mm_to_num "$min_mm")" ]; then
-        echo "$def_mm"
-        return 0
+        echo "$def_mm"; return 0
       fi
     fi
-    echo "$min_mm"
-    return 0
+    echo "$min_mm"; return 0
   fi
 
-  # 4) nothing to infer -> default
   echo "$def"
 }
 
 _apogee_uv_pin_python_if_missing() {
   local root="$1" py="$2"
-
-  # only pin numeric major.minor / major.minor.patch; don't pin paths like /usr/bin/python3
+  # only pin numeric versions
   printf '%s' "$py" | grep -Eq '^[0-9]+(\.[0-9]+){0,2}$' || return 0
-
   [ -f "$root/.python-version" ] && return 0
   [ -w "$root" ] || return 0
-
-  # This creates .python-version (uv-native)
   command uv python pin "$py" >/dev/null 2>&1 || true
 }
 
 _apogee_uv_ensure_python_installed() {
   local py="$1"
-
-  # Only install numeric specs; if it's a path or "python3", uv can try it directly.
   printf '%s' "$py" | grep -Eq '^[0-9]+(\.[0-9]+){0,2}$' || return 0
-
-  command uv python install "$py" >/dev/null 2>&1 || return 1
+  command uv python install "$py" >/dev/null 2>&1
 }
 
-# --- Activation ---------------------------------------------------------------
+# --- Activation (Apogee entrypoint) -----------------------------------------
 
 _apogee_uv_activate_in_project() {
   local root="$1"
@@ -212,15 +170,15 @@ _apogee_uv_activate_in_project() {
   command -v uv >/dev/null 2>&1 || { echo "uv not found on PATH" >&2; return 127; }
 
   local envroot="${UV_PROJECT_ENVIRONMENT:-${APOGEE_UV_VENV_ROOT}/$(basename "$root")}"
-  export UV_PROJECT_ENVIRONMENT="$envroot"   # lets uv know where to put the env  [oai_citation:2‡Astral Docs](https://docs.astral.sh/uv/reference/environment/)
+  export UV_PROJECT_ENVIRONMENT="$envroot"
 
   local want_spec=""
   want_spec="$(_apogee_uv_pick_python_for_project "$root")"
 
-  # If .python-version is missing, pin once so future runs are deterministic
+  # Pin once for determinism (writes .python-version in this project)
   _apogee_uv_pin_python_if_missing "$root" "$want_spec"
 
-  # Ensure the interpreter exists (persisted under UV_PYTHON_INSTALL_DIR if you set it)
+  # Ensure interpreter exists (persisted under UV_PYTHON_INSTALL_DIR from Apogee env)
   _apogee_uv_ensure_python_installed "$want_spec" || {
     echo "uv: failed to install/ensure Python '$want_spec'" >&2
     return 1
@@ -229,19 +187,18 @@ _apogee_uv_activate_in_project() {
   local q=""
   [ "${APOGEE_UV_QUIET:-0}" = "1" ] && q="-q"
 
-  # Create env if missing
   if [ ! -x "$envroot/bin/python" ]; then
     rm -rf "$envroot" 2>/dev/null || true
-    command uv venv --python "$want_spec" $q "$envroot" || return 1
 
-    # Sync deps
+    # IMPORTANT: rely on UV_PROJECT_ENVIRONMENT; don't pass env path (more compatible)
+    command uv venv --python "$want_spec" $q || return 1
+
     if [ -f uv.lock ]; then
       command uv sync --frozen $q || return 1
     else
       command uv lock $q && command uv sync $q || return 1
     fi
   else
-    # Optional sync on activate
     if [ "${APOGEE_UV_SYNC_ON_ACTIVATE:-0}" = "1" ] || [ "${APOGEE_UV_FORCE_SYNC:-0}" = "1" ]; then
       if [ -f uv.lock ]; then
         command uv sync --frozen $q || return 1
@@ -251,7 +208,6 @@ _apogee_uv_activate_in_project() {
     fi
   fi
 
-  # Activate
   # shellcheck disable=SC1090
   . "$envroot/bin/activate"
 }
