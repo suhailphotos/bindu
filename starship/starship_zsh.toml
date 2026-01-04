@@ -63,7 +63,6 @@ format = "[$hostname]($style) "
 style = "fg:dim"
 
 [hostname.aliases]
-[hostname.aliases]
 feather = ""
 quasar  = "󰖨"
 nimbus  = ""
