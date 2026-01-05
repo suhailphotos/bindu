@@ -1,5 +1,14 @@
 # apogee/functions/python_env.bash
 # UV-first python env + pkg (bash)
+#
+# Host-mimic policy:
+# - Do NOT set UV_PYTHON_INSTALL_DIR here.
+# - Let uv use its default per-user layout:
+#     ~/.local/share/uv/python
+#     ~/.local/share/uv/tools
+#     ~/.local/share/uv/bin
+# - Ensure requested Python exists *on-demand* (uv python install <ver>), idempotent.
+# - Starship env name comes from PROMPT_PY_ENV_NAME (set via PROMPT_COMMAND hook).
 
 : "${APOGEE_UV_VENV_ROOT:=$HOME/.venvs}"
 : "${APOGEE_UV_DEFAULT_PY:=auto-houdini}"
@@ -97,7 +106,7 @@ _apogee_houdini_python_mm() {
 _apogee_uv_default_python_spec() {
   local mode="${APOGEE_UV_DEFAULT_PY:-auto-houdini}"
 
-  # Explicit version requested
+  # Explicit version requested (3 / 3.11 / 3.11.7)
   if [ -n "$mode" ] && [ "$mode" != "auto-houdini" ]; then
     echo "$mode"; return 0
   fi
@@ -153,10 +162,19 @@ _apogee_uv_pin_python_if_missing() {
   command uv python pin "$py" >/dev/null 2>&1 || true
 }
 
+# IMPORTANT:
+# Host-mimic: do NOT control UV_PYTHON_INSTALL_DIR here.
+# Just ensure the requested Python exists in uv's default per-user store.
 _apogee_uv_ensure_python_installed() {
   local py="$1"
+
+  # only numeric specs
   printf '%s' "$py" | grep -Eq '^[0-9]+(\.[0-9]+){0,2}$' || return 0
-  command uv python install "$py" >/dev/null 2>&1
+  command -v uv >/dev/null 2>&1 || return 0
+
+  # Prefer a quiet no-op check; fall back to install.
+  # uv install is idempotent anyway, so this is safe.
+  command uv python install "$py" >/dev/null 2>&1 || command uv python install "$py"
 }
 
 # --- Activation (Apogee entrypoint) -----------------------------------------
@@ -178,7 +196,7 @@ _apogee_uv_activate_in_project() {
   # Pin once for determinism (writes .python-version in this project)
   _apogee_uv_pin_python_if_missing "$root" "$want_spec"
 
-  # Ensure interpreter exists (persisted under UV_PYTHON_INSTALL_DIR from Apogee env)
+  # Ensure interpreter exists (uv default per-user store)
   _apogee_uv_ensure_python_installed "$want_spec" || {
     echo "uv: failed to install/ensure Python '$want_spec'" >&2
     return 1
