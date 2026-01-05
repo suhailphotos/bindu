@@ -142,9 +142,9 @@ stem_serve = "cd \"$DROPBOX/matrix/docker/services/vortex/stem\""
 # -------------------------------------------------------------------
 # Cargo Crates
 # -------------------------------------------------------------------
-crates   = "cd \"$CRATES\""
+crates        = "cd \"$CRATES\""
 apogee_repo   = "cd \"$DROPBOX/matrix/crates/apogee\""
-rusk     = "cd \"$DROPBOX/matrix/crates/rusk\""
+rusk          = "cd \"$DROPBOX/matrix/crates/rusk\""
 
 
 [modules.cloud.dropbox.emit.paths]
@@ -732,7 +732,6 @@ APOGEE_USE_CONDA           = "0"
 # uv’s own locations
 UV_TOOL_DIR      = "{home}/.local/share/uv/tools"
 UV_TOOL_BIN_DIR  = "{home}/.local/share/uv/bin"
-UV_PYTHON_INSTALL_DIR = "{home}/.local/share/uv/python"
 
 [modules.apps.uv.emit.paths]
 prepend_if_exists = [
