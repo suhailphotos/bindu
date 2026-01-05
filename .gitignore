@@ -28,3 +28,5 @@ build/
 # uv
 uv/uv-receipt.json
 karabiner/karabiner.json
+
+.bindu_installed
