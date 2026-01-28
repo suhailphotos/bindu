@@ -733,6 +733,11 @@ APOGEE_USE_CONDA           = "0"
 UV_TOOL_DIR      = "{home}/.local/share/uv/tools"
 UV_TOOL_BIN_DIR  = "{home}/.local/share/uv/bin"
 
+# Temporary alias, use functions to handle activating env (pending)
+[modules.apps.uv.emit.aliases]
+alynx  = "cd $MATRIX/lynx && source $HOME/.venvs/lynx/bin/activate" # <----- move to functions when possible
+
+
 [modules.apps.uv.emit.paths]
 prepend_if_exists = [
   "$UV_TOOL_BIN_DIR",
