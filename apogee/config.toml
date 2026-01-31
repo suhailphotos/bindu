@@ -222,7 +222,7 @@ any_of = [
 
 [modules.cloud.whisk.emit.env]
 WHISK = "{detect.path}"
-WHISK_ML = "{detect.path}/work/ml"
+WHISK_ML_ROOT = "{detect.path}/work/ml"
 WHISK_MOUNTED = "1"
 
 [modules.cloud.whisk.emit.env_derived]
