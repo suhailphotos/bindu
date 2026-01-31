@@ -188,53 +188,50 @@ DATALIB = "{detect.path}"
 ML4VFX = "$DATALIB/threeD/courses/05_Machine_Learning_in_VFX"
 
 # -------------------------------------------------------------------
-# nebula_ai (ZFS share from zion; only active when mounted)
+# whisk (ZFS share from zion; only active when mounted)
 # -------------------------------------------------------------------
-[modules.cloud.nebula_ai]
+[modules.cloud.whisk]
 enabled   = true
 kind      = "storage"
 platforms = ["mac", "linux", "windows", "wsl", "other"]
 
-[modules.cloud.nebula_ai.detect.paths.mac]
+[modules.cloud.whisk.detect.paths.mac]
 any_of = [
-  "/Volumes/ai",
-  "/Volumes/nebula_ai",
+  "/Volumes/whisk",
 ]
 
-[modules.cloud.nebula_ai.detect.paths.linux]
+[modules.cloud.whisk.detect.paths.linux]
 any_of = [
-  "/mnt/ai",
-  "/mnt/nebula_ai",
+  "/mnt/whisk",
 ]
 
-[modules.cloud.nebula_ai.detect.paths.wsl]
+[modules.cloud.whisk.detect.paths.wsl]
 any_of = [
-  "/mnt/z/ai",
-  "/mnt/z/nebula_ai",
+  "/mnt/z/whisk",
 ]
 
-[modules.cloud.nebula_ai.detect.paths.windows]
+[modules.cloud.whisk.detect.paths.windows]
 any_of = [
-  "Z:\\ai",
-  "Z:\\nebula_ai",
+  "Z:\\whisk",
 ]
 
-[modules.cloud.nebula_ai.detect.paths.other]
+[modules.cloud.whisk.detect.paths.other]
 any_of = [
-  "{home}/ai",
+  "{home}/whisk",
 ]
 
-[modules.cloud.nebula_ai.emit.env]
-NEBULA_AI_ROOT = "{detect.path}"
-NEBULA_AI_MOUNTED = "1"
+[modules.cloud.whisk.emit.env]
+WHISK = "{detect.path}"
+WHISK_ML = "{detect.path}/work/ml"
+WHISK_MOUNTED = "1"
 
-[modules.cloud.nebula_ai.emit.env_derived]
-NEBULA_AI_MODELS       = "$NEBULA_AI_ROOT/models"
-NEBULA_AI_DATASETS     = "$NEBULA_AI_ROOT/datasets"
-NEBULA_AI_EXPERIMENTS  = "$NEBULA_AI_ROOT/experiments"
-NEBULA_AI_LOGS         = "$NEBULA_AI_ROOT/logs"
-NEBULA_AI_SCRIPTS      = "$NEBULA_AI_ROOT/scripts"
-NEBULA_AI_PROJECTS     = "$NEBULA_AI_ROOT/projects"
+[modules.cloud.whisk.emit.env_derived]
+WHISK_ML_MODELS       = "$WHISK_ML_ROOT/models"
+WHISK_ML_DATASETS     = "$WHISK_ML_ROOT/datasets"
+WHISK_ML_EXPERIMENTS  = "$WHISK_ML_ROOT/experiments"
+WHISK_ML_LOGS         = "$WHISK_ML_ROOT/logs"
+WHISK_ML_SCRIPTS      = "$WHISK_ML_ROOT/scripts"
+WHISK_ML_PROJECTS     = "$WHISK_ML_ROOT/projects"
 
 # --------------------------------------------------
 # scratch_paths (mac-only, local convenience paths)
