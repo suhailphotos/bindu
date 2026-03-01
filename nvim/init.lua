@@ -17,6 +17,7 @@ require("suhail.providers")
 -- Bootstrap: lazy.nvim
 -- --------------------------------------------------
 require("suhail.lazy_init")
+pcall(require, "suhail.treesitter_enable")
 
 -- --------------------------------------------------
 -- Python host resolver (fast, no imports at startup)
