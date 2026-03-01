@@ -3,49 +3,66 @@
 -- --------------------------------------------------
 return {
   "nvim-treesitter/nvim-treesitter",
-  lazy = false,            -- recommended by the plugin (no lazy-loading)
   build = ":TSUpdate",
+  lazy = false,
 
   config = function()
-    local ok, ts = pcall(require, "nvim-treesitter")
-    if not ok then
-      vim.notify("nvim-treesitter not found", vim.log.levels.ERROR)
+    ----------------------------------------------------------------------
+    -- NEW API (rewrite): nvim-treesitter exposes setup()/install()
+    ----------------------------------------------------------------------
+    local ok_new, ts = pcall(require, "nvim-treesitter")
+    if ok_new and type(ts.setup) == "function" then
+      -- setup installer location (optional)
+      pcall(ts.setup, {
+        install_dir = vim.fn.stdpath("data") .. "/site",
+      })
+
+      -- install list only if the function exists
+      if type(ts.install) == "function" then
+        pcall(ts.install, {
+          "vimdoc", "vim", "lua", "bash",
+          "javascript", "typescript", "json", "yaml", "toml",
+          "python", "rust", "c",
+          "markdown", "markdown_inline",
+          "dockerfile", "gitignore", "tmux",
+        }, { summary = false })
+      end
+
+      -- start TS highlighting per-buffer (needed on new API)
+      vim.api.nvim_create_autocmd("FileType", {
+        group = vim.api.nvim_create_augroup("SuhailTreesitterStart", { clear = true }),
+        callback = function(ev)
+          pcall(vim.treesitter.start, ev.buf)
+        end,
+      })
+
       return
     end
 
-    -- Optional: tell it where to install parsers/queries (your checkhealth shows this path)
-    ts.setup({
-      install_dir = vim.fn.stdpath("data") .. "/site",
-    })
+    ----------------------------------------------------------------------
+    -- OLD API (classic): require("nvim-treesitter.configs").setup(opts)
+    ----------------------------------------------------------------------
+    local ok_old, configs = pcall(require, "nvim-treesitter.configs")
+    if ok_old and type(configs.setup) == "function" then
+      configs.setup({
+        ensure_installed = {
+          "vimdoc", "vim", "lua", "bash",
+          "javascript", "typescript", "json", "yaml", "toml",
+          "python", "rust", "c",
+          "markdown", "markdown_inline",
+          "dockerfile", "gitignore", "tmux",
+        },
+        sync_install = false,
+        auto_install = false,
+        highlight = {
+          enable = true,
+          additional_vim_regex_highlighting = { "markdown" },
+        },
+        indent = { enable = true },
+      })
+      return
+    end
 
-    -- Install parsers you care about (async, no-op if already installed)
-    ts.install({
-      "vimdoc", "vim", "lua", "bash",
-      "javascript", "typescript", "json", "yaml", "toml",
-      "python", "rust", "c",
-      "markdown", "markdown_inline",
-      "dockerfile", "gitignore", "tmux",
-    }, { summary = false })
-
-    -- IMPORTANT: enable highlighting by starting Tree-sitter per buffer
-    vim.api.nvim_create_autocmd("FileType", {
-      group = vim.api.nvim_create_augroup("SuhailTreesitterStart", { clear = true }),
-      pattern = {
-        "python", "lua", "rust", "c", "bash",
-        "javascript", "typescript", "json", "yaml", "toml",
-        "markdown", "markdown_inline",
-        "dockerfile", "gitignore", "tmux",
-        "vim", "vimdoc",
-      },
-      callback = function(ev)
-        -- Start TS highlighting for this buffer
-        pcall(vim.treesitter.start, ev.buf)
-
-        -- Optional extras (uncomment if you want them):
-        -- vim.bo[ev.buf].indentexpr = "v:lua.require'nvim-treesitter'.indentexpr()"
-        -- vim.wo[ev.buf].foldexpr  = "v:lua.vim.treesitter.foldexpr()"
-        -- vim.wo[ev.buf].foldmethod = "expr"
-      end,
-    })
+    vim.notify("treesitter: no supported API found (new or old)", vim.log.levels.ERROR)
   end,
 }
