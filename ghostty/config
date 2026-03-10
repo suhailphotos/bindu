@@ -7,7 +7,7 @@
 # ----------------------------------------
 # Core
 # ----------------------------------------
-font-family = "SFMono Nerd Font"
+font-family = "SFMono Nerd Font Mono"
 command = /bin/zsh
 window-save-state = always
 window-colorspace = srgb
