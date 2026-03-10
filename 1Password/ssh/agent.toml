@@ -30,4 +30,4 @@
 #  https://developer.1password.com/docs/ssh/agent/config
 [[ssh-keys]]
 item  = "GitHub"
-vault = "security"
+vault = "SSH"
