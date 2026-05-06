@@ -30,3 +30,7 @@ uv/uv-receipt.json
 karabiner/karabiner.json
 
 .bindu_installed
+
+# Ignore SwiftPM artifacts
+swiftpm/cache
+swiftpm/security
