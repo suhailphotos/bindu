@@ -13,6 +13,29 @@ filenames:
       is_bold: true
       is_underline: false
 
+  uv.lock:
+    filename:
+      foreground: White
+      is_dimmed: true
+      is_bold: false
+      is_underline: false
+
+
+  WORKFLOW.md:
+    filename:
+      foreground: White
+      is_dimmed: true
+      is_bold: true
+      is_underline: false
+
+
+  WORKFLOW.md:
+    filename:
+      foreground: White
+      is_dimmed: true
+      is_bold: true
+      is_underline: false
+
   README.md:
     filename:
       foreground: White

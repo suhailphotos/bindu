@@ -126,6 +126,31 @@ matrix   = "cd \"$MATRIX\""
 packages = "cd \"$PACKAGES\""
 
 # -------------------------------------------------------------------
+# proetus project paths
+# -------------------------------------------------------------------
+[modules.cloud.proetus]
+enabled   = true
+kind      = "storage"
+platforms = ["mac"]
+
+[modules.cloud.proetus.detect.paths.mac]
+any_of = [
+  "{home}/Library/CloudStorage/Dropbox/matrix/proetus",
+]
+
+[modules.cloud.proetus.emit.env]
+PROETUS_REPO = "{detect.path}"
+
+[modules.cloud.proetus.emit.env_derived]
+PROETUS_DATA_ROOT   = "$PROETUS_REPO/data"
+PROETUS_SCRATCH_ROOT = "{home}/Documents/Scratch/tmp/Proetus"
+PROETUS_ASSETS_DIR  = "$PROETUS_SCRATCH_ROOT/assets"
+
+[modules.cloud.proetus.emit.aliases]
+proetus = "cd \"$PROETUS_REPO\""
+
+
+# -------------------------------------------------------------------
 # cd {repo_name}
 # -------------------------------------------------------------------
 hatch    = "cd \"$DROPBOX/matrix/hatch\""
