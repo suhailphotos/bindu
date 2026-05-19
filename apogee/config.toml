@@ -213,44 +213,167 @@ DATALIB = "{detect.path}"
 ML4VFX = "$DATALIB/threeD/courses/05_Machine_Learning_in_VFX"
 
 # -------------------------------------------------------------------
-# whisk (ZFS share from zion; only active when mounted)
+# whisk via Finder/macOS default mount
+# Detects a real subfolder so an empty mount folder does not count.
 # -------------------------------------------------------------------
-[modules.cloud.whisk]
+[modules.cloud.whisk_macos_volumes]
 enabled   = true
 kind      = "storage"
-platforms = ["mac", "linux", "windows", "wsl", "other"]
+platforms = ["mac"]
+priority  = 300
 
-[modules.cloud.whisk.detect.paths.mac]
+[modules.cloud.whisk_macos_volumes.detect.paths.mac]
 any_of = [
-  "/Volumes/whisk",
+  "/Volumes/whisk/work/ml",
 ]
 
-[modules.cloud.whisk.detect.paths.linux]
-any_of = [
-  "/mnt/whisk",
-]
-
-[modules.cloud.whisk.detect.paths.wsl]
-any_of = [
-  "/mnt/z/whisk",
-]
-
-[modules.cloud.whisk.detect.paths.windows]
-any_of = [
-  "Z:\\whisk",
-]
-
-[modules.cloud.whisk.detect.paths.other]
-any_of = [
-  "{home}/whisk",
-]
-
-[modules.cloud.whisk.emit.env]
-WHISK = "{detect.path}"
-WHISK_ML_ROOT = "{detect.path}/work/ml"
+[modules.cloud.whisk_macos_volumes.emit.env]
+WHISK = "/Volumes/whisk"
+WHISK_ML_ROOT = "$WHISK/work/ml"
 WHISK_MOUNTED = "1"
 
-[modules.cloud.whisk.emit.env_derived]
+[modules.cloud.whisk_macos_volumes.emit.env_derived]
+WHISK_ML_MODELS       = "$WHISK_ML_ROOT/models"
+WHISK_ML_DATASETS     = "$WHISK_ML_ROOT/datasets"
+WHISK_ML_EXPERIMENTS  = "$WHISK_ML_ROOT/experiments"
+WHISK_ML_LOGS         = "$WHISK_ML_ROOT/logs"
+WHISK_ML_SCRIPTS      = "$WHISK_ML_ROOT/scripts"
+WHISK_ML_PROJECTS     = "$WHISK_ML_ROOT/projects"
+
+
+# -------------------------------------------------------------------
+# whisk via persistent user mount
+# Used by automount-smb-volumes.zsh / launchd.
+# -------------------------------------------------------------------
+[modules.cloud.whisk_macos_mounts]
+enabled   = true
+kind      = "storage"
+platforms = ["mac"]
+priority  = 310
+
+[modules.cloud.whisk_macos_mounts.detect.paths.mac]
+any_of = [
+  "{home}/Mounts/whisk/work/ml",
+]
+
+[modules.cloud.whisk_macos_mounts.emit.env]
+WHISK = "{home}/Mounts/whisk"
+WHISK_ML_ROOT = "$WHISK/work/ml"
+WHISK_MOUNTED = "1"
+
+[modules.cloud.whisk_macos_mounts.emit.env_derived]
+WHISK_ML_MODELS       = "$WHISK_ML_ROOT/models"
+WHISK_ML_DATASETS     = "$WHISK_ML_ROOT/datasets"
+WHISK_ML_EXPERIMENTS  = "$WHISK_ML_ROOT/experiments"
+WHISK_ML_LOGS         = "$WHISK_ML_ROOT/logs"
+WHISK_ML_SCRIPTS      = "$WHISK_ML_ROOT/scripts"
+WHISK_ML_PROJECTS     = "$WHISK_ML_ROOT/projects"
+
+
+# -------------------------------------------------------------------
+# whisk on Linux
+# -------------------------------------------------------------------
+[modules.cloud.whisk_linux]
+enabled   = true
+kind      = "storage"
+platforms = ["linux"]
+priority  = 300
+
+[modules.cloud.whisk_linux.detect.paths.linux]
+any_of = [
+  "/mnt/whisk/work/ml",
+]
+
+[modules.cloud.whisk_linux.emit.env]
+WHISK = "/mnt/whisk"
+WHISK_ML_ROOT = "$WHISK/work/ml"
+WHISK_MOUNTED = "1"
+
+[modules.cloud.whisk_linux.emit.env_derived]
+WHISK_ML_MODELS       = "$WHISK_ML_ROOT/models"
+WHISK_ML_DATASETS     = "$WHISK_ML_ROOT/datasets"
+WHISK_ML_EXPERIMENTS  = "$WHISK_ML_ROOT/experiments"
+WHISK_ML_LOGS         = "$WHISK_ML_ROOT/logs"
+WHISK_ML_SCRIPTS      = "$WHISK_ML_ROOT/scripts"
+WHISK_ML_PROJECTS     = "$WHISK_ML_ROOT/projects"
+
+
+# -------------------------------------------------------------------
+# whisk on WSL
+# -------------------------------------------------------------------
+[modules.cloud.whisk_wsl]
+enabled   = true
+kind      = "storage"
+platforms = ["wsl"]
+priority  = 300
+
+[modules.cloud.whisk_wsl.detect.paths.wsl]
+any_of = [
+  "/mnt/z/whisk/work/ml",
+]
+
+[modules.cloud.whisk_wsl.emit.env]
+WHISK = "/mnt/z/whisk"
+WHISK_ML_ROOT = "$WHISK/work/ml"
+WHISK_MOUNTED = "1"
+
+[modules.cloud.whisk_wsl.emit.env_derived]
+WHISK_ML_MODELS       = "$WHISK_ML_ROOT/models"
+WHISK_ML_DATASETS     = "$WHISK_ML_ROOT/datasets"
+WHISK_ML_EXPERIMENTS  = "$WHISK_ML_ROOT/experiments"
+WHISK_ML_LOGS         = "$WHISK_ML_ROOT/logs"
+WHISK_ML_SCRIPTS      = "$WHISK_ML_ROOT/scripts"
+WHISK_ML_PROJECTS     = "$WHISK_ML_ROOT/projects"
+
+
+# -------------------------------------------------------------------
+# whisk on Windows
+# -------------------------------------------------------------------
+[modules.cloud.whisk_windows]
+enabled   = true
+kind      = "storage"
+platforms = ["windows"]
+priority  = 300
+
+[modules.cloud.whisk_windows.detect.paths.windows]
+any_of = [
+  "Z:\\whisk\\work\\ml",
+]
+
+[modules.cloud.whisk_windows.emit.env]
+WHISK = "Z:\\whisk"
+WHISK_ML_ROOT = "$WHISK\\work\\ml"
+WHISK_MOUNTED = "1"
+
+[modules.cloud.whisk_windows.emit.env_derived]
+WHISK_ML_MODELS       = "$WHISK_ML_ROOT\\models"
+WHISK_ML_DATASETS     = "$WHISK_ML_ROOT\\datasets"
+WHISK_ML_EXPERIMENTS  = "$WHISK_ML_ROOT\\experiments"
+WHISK_ML_LOGS         = "$WHISK_ML_ROOT\\logs"
+WHISK_ML_SCRIPTS      = "$WHISK_ML_ROOT\\scripts"
+WHISK_ML_PROJECTS     = "$WHISK_ML_ROOT\\projects"
+
+
+# -------------------------------------------------------------------
+# whisk fallback on other platforms
+# -------------------------------------------------------------------
+[modules.cloud.whisk_other]
+enabled   = true
+kind      = "storage"
+platforms = ["other"]
+priority  = 300
+
+[modules.cloud.whisk_other.detect.paths.other]
+any_of = [
+  "{home}/whisk/work/ml",
+]
+
+[modules.cloud.whisk_other.emit.env]
+WHISK = "{home}/whisk"
+WHISK_ML_ROOT = "$WHISK/work/ml"
+WHISK_MOUNTED = "1"
+
+[modules.cloud.whisk_other.emit.env_derived]
 WHISK_ML_MODELS       = "$WHISK_ML_ROOT/models"
 WHISK_ML_DATASETS     = "$WHISK_ML_ROOT/datasets"
 WHISK_ML_EXPERIMENTS  = "$WHISK_ML_ROOT/experiments"
@@ -906,6 +1029,33 @@ any_of = ["yazi"]
 files = [
   "{config_dir}/functions/yazi.{shell_ext}",
 ]
+
+# --------------------------------------------------
+# SMB volume controls
+# --------------------------------------------------
+[modules.apps.smb_volumes]
+enabled   = true
+kind      = "cli"
+priority  = 155
+platforms = ["mac"]
+
+[modules.apps.smb_volumes.detect.paths.mac]
+any_of = [
+  "{home}/.local/bin/automount-smb-volumes.zsh",
+]
+
+[modules.apps.smb_volumes.emit.functions]
+files = [
+  "{config_dir}/functions/smb_volumes.{shell_ext}",
+]
+
+[modules.apps.smb_volumes.emit.aliases]
+smbmount   = "smb-volumes mount"
+smbumount  = "smb-volumes unmount"
+smbremount = "smb-volumes remount"
+smblog     = "smb-volumes logs"
+smbstatus  = "smb-volumes status"
+
 
 # ===================================================================
 # MODULES: TEMPLATES
