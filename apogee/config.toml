@@ -165,8 +165,8 @@ PROETUS_IMAGES_ROOT  = "{home}/Mounts/dataLib/Pictures/Images"
 
 # Travel machine.
 [modules.cloud.proetus.emit.env_hosts.eclipse]
-PROETUS_SCRATCH_ROOT = "/Volumes/Breakwater/Scratch/tmp/Proetus"
-PROETUS_IMAGES_ROOT  = "/Volumes/Breakwater/Pictures/Images"
+PROETUS_SCRATCH_ROOT = "/Volumes/Orion/Scratch/tmp/Proetus"
+PROETUS_IMAGES_ROOT  = "/Volumes/Orion/Pictures/Images"
 
 [modules.cloud.proetus.emit.env_derived]
 PROETUS_DATA_ROOT          = "$PROETUS_REPO/data"
