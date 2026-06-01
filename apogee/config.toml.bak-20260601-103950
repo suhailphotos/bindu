@@ -391,37 +391,6 @@ WHISK_ML_LOGS         = "$WHISK_ML_ROOT/logs"
 WHISK_ML_SCRIPTS      = "$WHISK_ML_ROOT/scripts"
 WHISK_ML_PROJECTS     = "$WHISK_ML_ROOT/projects"
 
-# -------------------------------------------------------------------
-# whisk travel copy on Orion
-# Used only on eclipse while traveling.
-# Mirrors the network WHISK ZFS share.
-# -------------------------------------------------------------------
-[modules.cloud.whisk_orion]
-enabled   = true
-kind      = "storage"
-platforms = ["mac"]
-priority  = 330
-hosts     = ["eclipse"]
-
-[modules.cloud.whisk_orion.detect.paths.mac]
-any_of = [
-  "/Volumes/Orion/Clariform/whisk/work/ml",
-]
-
-[modules.cloud.whisk_orion.emit.env]
-WHISK = "/Volumes/Orion/Clariform/whisk"
-WHISK_ML_ROOT = "$WHISK/work/ml"
-WHISK_MOUNTED = "1"
-WHISK_SOURCE = "orion"
-
-[modules.cloud.whisk_orion.emit.env_derived]
-WHISK_ML_MODELS       = "$WHISK_ML_ROOT/models"
-WHISK_ML_DATASETS     = "$WHISK_ML_ROOT/datasets"
-WHISK_ML_EXPERIMENTS  = "$WHISK_ML_ROOT/experiments"
-WHISK_ML_LOGS         = "$WHISK_ML_ROOT/logs"
-WHISK_ML_SCRIPTS      = "$WHISK_ML_ROOT/scripts"
-WHISK_ML_PROJECTS     = "$WHISK_ML_ROOT/projects"
-
 # --------------------------------------------------
 # scratch_paths (mac-only, local convenience paths)
 # --------------------------------------------------
