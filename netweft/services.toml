@@ -10,6 +10,10 @@ enabled = true
 ipv4 = "10.78.29.29"
 ipv6_interface_id = "2929"
 
+[services.bind9.ingress]
+mode = "host-port"
+interface = "lan"
+
 [[services.bind9.ports]]
 host = 53
 container = 53
@@ -32,6 +36,10 @@ enabled = true
 [services.nginx.address]
 ipv4 = "10.78.88.88"
 ipv6_interface_id = "8888"
+
+[services.nginx.ingress]
+mode = "host-port"
+interface = "lan"
 
 [[services.nginx.ports]]
 host = 80

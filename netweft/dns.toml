@@ -44,11 +44,34 @@ name = "suhail.life"
 visibility = "internal"
 authoritative = true
 
-[[aliases]]
-name = "family.suhail.life"
-target_service = "nginx"
-
-[[aliases]]
-name = "ds1621plus.suhail.ink"
-target_host = "synology"
+[[records]]
+name = "nexus.suhail.ink"
+kind = "host"
+target = "nexus"
 interface = "lan"
+families = ["ipv4"]
+reverse = true
+
+[[records]]
+name = "bind9.internal.suhail.ink"
+kind = "service"
+target = "bind9"
+address_scope = "container"
+families = ["ipv4"]
+reverse = true
+
+[[records]]
+name = "nginx.internal.suhail.ink"
+kind = "service"
+target = "nginx"
+address_scope = "container"
+families = ["ipv4"]
+reverse = true
+
+[[records]]
+name = "family.suhail.life"
+kind = "service"
+target = "nginx"
+address_scope = "ingress"
+families = ["ipv4"]
+reverse = false

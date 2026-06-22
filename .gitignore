@@ -34,3 +34,6 @@ karabiner/karabiner.json
 # Ignore SwiftPM artifacts
 swiftpm/cache
 swiftpm/security
+
+# netweft
+Netweft.backup.*/
