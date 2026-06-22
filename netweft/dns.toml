@@ -57,7 +57,7 @@ name = "bind9.internal.suhail.ink"
 kind = "service"
 target = "bind9"
 address_scope = "container"
-families = ["ipv4"]
+families = ["ipv4", "ipv6"]
 reverse = true
 
 [[records]]
@@ -65,7 +65,7 @@ name = "nginx.internal.suhail.ink"
 kind = "service"
 target = "nginx"
 address_scope = "container"
-families = ["ipv4"]
+families = ["ipv4", "ipv6"]
 reverse = true
 
 [[records]]

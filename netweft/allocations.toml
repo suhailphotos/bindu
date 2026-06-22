@@ -1,4 +1,11 @@
 schema_version = 1
 
-# Netweft will populate this section through `netweft ula generate`.
-# It is intentionally absent until a stable ULA /48 is generated.
+[ula]
+prefix = "fdd7:d134:61e3::/48"
+
+[ula.segments]
+main = 256
+
+[ula.networks]
+nexus-containers = 289
+vortex-containers = 321

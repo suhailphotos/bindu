@@ -21,8 +21,9 @@ vlan_id = 0
 
 [hosts.nexus.interfaces.lan]
 segment = "main"
-ipv4 = "10.214.90.194"
+ipv4 = "10.214.90.10"
 ipv6_mode = "slaac"
+ula_interface_id = "10"
 
 [hosts.eclipse.interfaces.wifi]
 segment = "main"

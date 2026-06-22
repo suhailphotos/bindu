@@ -54,6 +54,19 @@ protocol = "tcp"
 [services.nginx.runtime]
 certificates = "{host.runtime_root}/nginx/certs"
 
+[services.db]
+kind = "database"
+host = "nexus"
+network = "nexus-containers"
+enabled = true
+
+[services.db.address]
+ipv4 = "10.78.29.31"
+ipv6_interface_id = "2931"
+
+[services.db.runtime]
+data = "{host.runtime_root}/mariadb/data"
+
 [services.neuron]
 kind = "development-container"
 host = "vortex"
