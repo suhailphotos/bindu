@@ -1,4 +1,0 @@
-schema_version = 1
-
-# Netweft will populate this section through `netweft ula generate`.
-# It is intentionally absent until a stable ULA /48 is generated.
