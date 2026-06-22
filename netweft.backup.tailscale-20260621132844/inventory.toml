@@ -1,0 +1,65 @@
+schema_version = 1
+
+[domains]
+primary = "suhail.ink"
+additional = ["suhail.photos", "suhail.art", "suhail.life"]
+
+[hosts.nexus]
+kind = "physical"
+roles = ["infrastructure", "dns", "proxy", "docker", "tailscale"]
+runtime_root = "/var/lib/suhail/services/nexus"
+ssh_user = "suhail"
+enabled = true
+
+[hosts.nexus.tailscale]
+hostname = "nexus.zapus-cod.ts.net"
+
+[hosts.zion]
+kind = "physical"
+roles = ["proxmox"]
+ssh_user = "suhail"
+enabled = true
+
+[hosts.atlas]
+kind = "physical"
+roles = ["proxmox"]
+ssh_user = "suhail"
+enabled = true
+
+[hosts.summit]
+kind = "physical"
+roles = ["proxmox"]
+ssh_user = "suhail"
+enabled = false
+
+[hosts.vortex]
+kind = "vm"
+parent = "zion"
+roles = ["docker", "gpu", "development"]
+runtime_root = "/var/lib/suhail/services/vortex"
+ssh_user = "suhail"
+enabled = true
+
+[hosts.vortex.tailscale]
+hostname = "vortex.zapus-cod.ts.net"
+
+[hosts.eclipse]
+kind = "laptop"
+roles = ["client", "development"]
+enabled = true
+
+[hosts.eclipse.tailscale]
+hostname = "eclipse.zapus-cod.ts.net"
+
+[hosts.quasar]
+kind = "workstation"
+roles = ["client", "development"]
+enabled = true
+
+[hosts.quasar.tailscale]
+hostname = "quasar.zapus-cod.ts.net"
+
+[hosts.synology]
+kind = "nas"
+roles = ["storage"]
+enabled = true

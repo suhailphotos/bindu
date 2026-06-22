@@ -1,0 +1,6 @@
+{
+  "trustedtaps": [
+    "epk/epk",
+    "orbyts/tap"
+  ]
+}
