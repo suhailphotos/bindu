@@ -51,7 +51,7 @@ roles = ["client", "development"]
 enabled = true
 
 
-[hosts.synology]
+[hosts.ds1621plus]
 kind = "nas"
 roles = ["storage"]
 enabled = true

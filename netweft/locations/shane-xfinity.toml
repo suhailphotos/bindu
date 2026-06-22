@@ -44,3 +44,9 @@ advertise = [
     "segment:main",
     "network:nexus-containers",
 ]
+
+[hosts.ds1621plus.interfaces.lan]
+segment = "main"
+ipv4 = "10.214.90.20"
+ipv6_mode = "slaac"
+ula_interface_id = "20"

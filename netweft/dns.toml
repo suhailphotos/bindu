@@ -75,3 +75,11 @@ target = "nginx"
 address_scope = "ingress"
 families = ["ipv4"]
 reverse = false
+
+[[records]]
+name = "ds1621plus.suhail.ink"
+kind = "host"
+target = "ds1621plus"
+interface = "lan"
+families = ["ipv4"]
+reverse = true
