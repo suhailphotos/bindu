@@ -83,7 +83,7 @@ route = "tailscale-host"
 kind = "web"
 host = "vortex"
 network = "vortex-containers"
-enabled = true
+enabled = false
 
 [services.jellyfin.address]
 ipv4 = "10.74.1.10"
@@ -95,3 +95,27 @@ domain = "jellyfin.suhail.ink"
 access = "reverse-proxy"
 proxy = "nginx"
 tls = true
+certificate = "wildcard-suhail"
+force_https = true
+websocket = true
+
+[certificates.wildcard-suhail]
+domains = ["suhail.ink", "*.suhail.ink"]
+certificate_path = "/etc/netweft/certificates/wildcard-suhail/fullchain.pem"
+private_key_path = "/etc/netweft/certificates/wildcard-suhail/privkey.pem"
+
+[services.dsm]
+kind = "web"
+host = "ds1621plus"
+network = "nexus-containers"
+enabled = true
+
+[services.dsm.web]
+container_port = 5001
+domain = "dsm.suhail.ink"
+access = "reverse-proxy"
+proxy = "nginx"
+scheme = "https"
+tls = true
+certificate = "wildcard-suhail"
+force_https = true
