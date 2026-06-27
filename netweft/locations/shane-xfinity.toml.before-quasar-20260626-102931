@@ -30,12 +30,6 @@ segment = "main"
 ipv6_mode = "slaac"
 
 
-[hosts.quasar.interfaces.lan]
-segment = "main"
-ipv4 = "10.214.90.60"
-ipv6_mode = "slaac"
-ula_interface_id = "60"
-
 [tailscale]
 enabled = true
 strategy = "subnet-router"

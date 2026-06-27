@@ -99,12 +99,3 @@ target = "nginx"
 address_scope = "ingress"
 families = ["ipv4"]
 reverse = false
-
-[[records]]
-name = "quasar.suhail.ink"
-kind = "host"
-target = "quasar"
-interface = "lan"
-families = ["ipv4"]
-reverse = true
-

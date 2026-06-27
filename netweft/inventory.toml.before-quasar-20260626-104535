@@ -48,8 +48,8 @@ enabled = true
 [hosts.quasar]
 kind = "workstation"
 roles = ["client", "development"]
-ssh_user = "suhail"
 enabled = true
+
 
 [hosts.ds1621plus]
 kind = "nas"
