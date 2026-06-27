@@ -108,3 +108,11 @@ interface = "lan"
 families = ["ipv4"]
 reverse = true
 
+[[records]]
+name = "zion.suhail.ink"
+kind = "host"
+target = "zion"
+interface = "lan"
+families = ["ipv4"]
+reverse = true
+

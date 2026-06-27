@@ -36,6 +36,12 @@ ipv4 = "10.214.90.60"
 ipv6_mode = "slaac"
 ula_interface_id = "60"
 
+[hosts.zion.interfaces.lan]
+segment = "main"
+ipv4 = "10.214.90.30"
+ipv6_mode = "slaac"
+ula_interface_id = "30"
+
 [tailscale]
 enabled = true
 strategy = "subnet-router"

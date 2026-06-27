@@ -15,8 +15,52 @@ enabled = true
 [hosts.zion]
 kind = "physical"
 roles = ["proxmox"]
-ssh_user = "suhail"
+ssh_user = "root"
 enabled = true
+
+[hosts.zion.network]
+provider = "proxmox-ifupdown2"
+management_interface = "lan"
+preserve_includes = true
+
+[[hosts.zion.network.links]]
+name = "enp3s0f0np0"
+kind = "ethernet"
+
+[[hosts.zion.network.links]]
+name = "enp3s0f1np1"
+kind = "ethernet"
+
+[[hosts.zion.network.links]]
+name = "enp88s0"
+kind = "ethernet"
+
+[[hosts.zion.network.links]]
+name = "enp91s0"
+kind = "ethernet"
+
+[[hosts.zion.network.links]]
+name = "wlp92s0"
+kind = "wifi"
+
+[[hosts.zion.network.bridges]]
+name = "vmbr0"
+ports = ["enp3s0f1np1"]
+location_interface = "lan"
+vlan_aware = true
+allowed_vlans = "2-4094"
+stp = false
+forward_delay = 0
+comment = "Primary"
+
+[[hosts.zion.network.bridges]]
+name = "vmbr1"
+ports = []
+vlan_aware = true
+allowed_vlans = "2-4094"
+stp = false
+forward_delay = 0
+comment = "VM & CT Network"
 
 [hosts.atlas]
 kind = "physical"
