@@ -54,3 +54,11 @@ service = "neuron"
 user = "suhail"
 identity = "default-linux"
 forward_agent = true
+
+[clients.eclipse]
+
+[clients.eclipse.identities.default-linux]
+file = "~/.ssh/id_rsa"
+
+[clients.eclipse.identities.proxmox]
+file = "~/.ssh/id_proxmox"
