@@ -1,0 +1,19 @@
+schema_version = 1
+
+[permissions.zion-iso]
+nas = "ds1621plus"
+provider = "synology-nfs"
+share = "iso"
+client_host = "zion"
+access = "read-write"
+squash = "none"
+security = "sys"
+
+[permissions.vortex-datalib]
+nas = "ds1621plus"
+provider = "synology-nfs"
+share = "dataLib"
+client_host = "vortex"
+access = "read-write"
+squash = "none"
+security = "sys"

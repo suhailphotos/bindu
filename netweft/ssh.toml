@@ -1,0 +1,56 @@
+schema_version = 1
+
+[clients.quasar]
+
+[clients.quasar.identities.default-linux]
+file = "~/.ssh/id_rsa"
+
+[clients.quasar.identities.proxmox]
+file = "~/.ssh/id_proxmox"
+
+[clients.quasar.identities.anchor]
+file = "~/.ssh/id_anchor"
+
+[targets.nexus]
+host = "nexus"
+interface = "lan"
+user = "suhail"
+port = 22
+identity = "default-linux"
+forward_agent = false
+
+[targets.vortex]
+host = "vortex"
+interface = "lan"
+user = "suhail"
+port = 22
+identity = "default-linux"
+forward_agent = false
+
+[targets.zion]
+host = "zion"
+interface = "lan"
+user = "root"
+port = 22
+identity = "proxmox"
+forward_agent = false
+
+[targets.flicker]
+guest = "flicker"
+user = "suhail"
+port = 22
+identity = "default-linux"
+forward_agent = false
+
+[targets.whisk]
+guest = "whisk"
+user = "suhail"
+port = 22
+identity = "default-linux"
+forward_agent = false
+
+[targets.neuron]
+service = "neuron"
+user = "suhail"
+identity = "default-linux"
+forward_agent = true

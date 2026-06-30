@@ -1,0 +1,10 @@
+schema_version = 1
+
+[mounts.vortex-datalib]
+host = "vortex"
+provider = "nfs"
+server_host = "ds1621plus"
+export = "/volume1/dataLib"
+mount_path = "/mnt/dataLib"
+options = ["vers=4.1", "proto=tcp", "rw", "_netdev", "nofail", "timeo=600", "retrans=2"]
+required_by = ["docker.service"]

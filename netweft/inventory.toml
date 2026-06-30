@@ -50,7 +50,7 @@ location_interface = "lan"
 vlan_aware = true
 allowed_vlans = "2-4094"
 stp = false
-forward_delay = 0
+forward_delay = 2
 comment = "Primary"
 
 [[hosts.zion.network.bridges]]
@@ -59,7 +59,7 @@ ports = []
 vlan_aware = true
 allowed_vlans = "2-4094"
 stp = false
-forward_delay = 0
+forward_delay = 2
 comment = "VM & CT Network"
 
 [hosts.atlas]
@@ -81,6 +81,13 @@ roles = ["docker", "gpu", "development"]
 runtime_root = "/var/lib/suhail/services/vortex"
 ssh_user = "suhail"
 enabled = true
+
+[hosts.vortex.os_network]
+provider = "netplan"
+renderer = "networkd"
+interface = "enp6s18"
+ipv4_mode = "dhcp"
+ipv6_mode = "router-advertised"
 
 
 [hosts.eclipse]

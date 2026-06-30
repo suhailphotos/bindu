@@ -1,0 +1,44 @@
+schema_version = 1
+
+[guests.flicker]
+kind = "lxc"
+host = "zion"
+vmid = 111
+firewall = true
+mac = "BC:24:11:69:EE:7F"
+interface = "lan"
+bridge = "vmbr0"
+ipv4 = "10.214.90.31"
+address_mode = "reserved-dhcp"
+onboot = true
+
+[guests.whisk]
+kind = "lxc"
+host = "zion"
+vmid = 112
+mac = "BC:24:11:58:75:07"
+interface = "lan"
+bridge = "vmbr0"
+ipv4 = "10.214.90.32"
+address_mode = "reserved-dhcp"
+onboot = true
+
+[guests.vortex]
+kind = "vm"
+host = "zion"
+vmid = 212
+mac = "BC:24:11:4C:28:D9"
+interface = "lan"
+bridge = "vmbr0"
+ipv4 = "10.214.90.35"
+address_mode = "reserved-dhcp"
+onboot = true
+startup = "order=10,up=30,down=60"
+[[guests.vortex.pci_devices]]
+slot = 0
+device = "0000:01:00"
+
+[[guests.vortex.virtiofs]]
+slot = 0
+directory = "whisk"
+expose_acl = true

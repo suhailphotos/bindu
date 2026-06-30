@@ -119,3 +119,36 @@ scheme = "https"
 tls = true
 certificate = "wildcard-suhail"
 force_https = true
+
+[services.ds1621plus-ui]
+kind = "web"
+host = "ds1621plus"
+network = "nexus-containers"
+enabled = true
+
+[services.ds1621plus-ui.web]
+container_port = 5001
+domain = "ds1621plus.suhail.ink"
+access = "reverse-proxy"
+proxy = "nginx"
+scheme = "https"
+tls = true
+certificate = "wildcard-suhail"
+force_https = true
+
+[services.zion-ui]
+kind = "web"
+host = "zion"
+network = "nexus-containers"
+enabled = true
+
+[services.zion-ui.web]
+container_port = 8006
+domain = "zion.suhail.ink"
+access = "reverse-proxy"
+proxy = "nginx"
+scheme = "https"
+tls = true
+certificate = "wildcard-suhail"
+force_https = true
+websocket = true

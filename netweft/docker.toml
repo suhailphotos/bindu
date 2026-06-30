@@ -1,0 +1,21 @@
+schema_version = 1
+
+[hosts.nexus]
+bridge_ipv4_cidr = "10.29.31.0/24"
+bridge_ipv6_cidr = "fdd7:d134:61e3:120::/64"
+
+ipv4_pool_base = "10.77.0.0/16"
+ipv4_pool_size = 24
+
+ipv6_pool_base = "fdd7:d134:61e3:130::/60"
+ipv6_pool_size = 64
+
+[hosts.vortex]
+bridge_ipv4_cidr = "10.29.22.0/24"
+bridge_ipv6_cidr = "fdd7:d134:61e3:140::/64"
+
+ipv4_pool_base = "10.74.0.0/16"
+ipv4_pool_size = 24
+
+ipv6_pool_base = "fdd7:d134:61e3:150::/60"
+ipv6_pool_size = 64

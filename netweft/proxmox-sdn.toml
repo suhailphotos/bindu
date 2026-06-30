@@ -1,0 +1,18 @@
+schema_version = 1
+
+[zones.pacific]
+host = "zion"
+kind = "simple"
+ipam = "pve"
+dhcp = "dnsmasq"
+
+[vnets.shasta]
+zone = "pacific"
+alias = "shasta"
+
+[[vnets.shasta.subnets]]
+cidr = "10.29.100.0/24"
+gateway = "10.29.100.1"
+dhcp_start = "10.29.100.100"
+dhcp_end = "10.29.100.254"
+snat = true

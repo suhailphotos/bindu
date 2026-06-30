@@ -1,0 +1,12 @@
+schema_version = 1
+
+[storages.synology]
+host = "zion"
+storage_id = "Synology"
+provider = "nfs"
+server_host = "ds1621plus"
+export = "/volume1/iso"
+mount_path = "/mnt/pve/Synology"
+options = ["vers=4.1", "proto=tcp"]
+content = ["images", "backup", "iso", "vztmpl"]
+prune_backups = "keep-all=1"
