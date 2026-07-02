@@ -163,11 +163,6 @@ PROETUS_IMAGES_ROOT  = "{home}/Mounts/dataLib/Pictures/Images"
 PROETUS_SCRATCH_ROOT = "{home}/Documents/Scratch/tmp/Proetus"
 PROETUS_IMAGES_ROOT  = "{home}/Mounts/dataLib/Pictures/Images"
 
-# Travel machine.
-[modules.cloud.proetus.emit.env_hosts.eclipse]
-PROETUS_SCRATCH_ROOT = "/Volumes/Orion/Scratch/tmp/Proetus"
-PROETUS_IMAGES_ROOT  = "/Volumes/Orion/Pictures/Images"
-
 [modules.cloud.proetus.emit.env_derived]
 PROETUS_DATA_ROOT          = "$PROETUS_REPO/data"
 PROETUS_ASSETS_DIR         = "$PROETUS_SCRATCH_ROOT/assets"
@@ -178,7 +173,7 @@ PROETUS_RUNTIME_DIR        = "$PROETUS_REPO/runtime"
 PROETUS_DB_PATH            = "$PROETUS_RUNTIME_DIR/proetus.sqlite3"
 
 [modules.cloud.proetus.emit.aliases]
-proetus = "cd \"$PROETUS_REPO\""
+cd-proetus = "cd \"$PROETUS_REPO\""
 proetusscratch = "cd \"$PROETUS_SCRATCH_ROOT\""
 proetusassets = "cd \"$PROETUS_ASSETS_DIR\""
 
@@ -278,6 +273,46 @@ WHISK_ML_EXPERIMENTS  = "$WHISK_ML_ROOT/experiments"
 WHISK_ML_LOGS         = "$WHISK_ML_ROOT/logs"
 WHISK_ML_SCRIPTS      = "$WHISK_ML_ROOT/scripts"
 WHISK_ML_PROJECTS     = "$WHISK_ML_ROOT/projects"
+
+
+# -------------------------------------------------------------------
+# lureva project and ML data paths
+# -------------------------------------------------------------------
+[modules.cloud.lureva]
+enabled   = true
+kind      = "storage"
+platforms = ["mac"]
+requires  = ["cloud.dropbox"]
+
+[modules.cloud.lureva.detect.paths.mac]
+any_of = [
+  "{home}/Library/CloudStorage/Dropbox/matrix/packages/lureva",
+]
+
+[modules.cloud.lureva.emit.env]
+LUREVA_REPO         = "{detect.path}"
+LUREVA_CATALOG_ROOT = "{home}/Pictures/Lightroom/Lureva"
+
+[modules.cloud.lureva.emit.env_derived]
+LUREVA_DATA_ROOT        = "$WHISK_ML_DATASETS/lureva"
+LUREVA_CORPUS_ROOT      = "$LUREVA_DATA_ROOT/corpus"
+LUREVA_DERIVED_ROOT     = "$LUREVA_DATA_ROOT/derived"
+LUREVA_REPORTS_ROOT     = "$LUREVA_DATA_ROOT/reports"
+
+LUREVA_MODELS_ROOT      = "$WHISK_ML_MODELS/lureva"
+LUREVA_EXPERIMENTS_ROOT = "$WHISK_ML_EXPERIMENTS/lureva"
+LUREVA_LOGS_ROOT        = "$WHISK_ML_LOGS/lureva"
+
+LUREVA_LIGHTROOM_CATALOG_DIR  = "$LUREVA_CATALOG_ROOT/Lr_lureva"
+LUREVA_LIGHTROOM_CATALOG_PATH = "$LUREVA_LIGHTROOM_CATALOG_DIR/Lr_lureva.lrcat"
+
+LUREVA_PROETUS_CORPUS    = "$LUREVA_CORPUS_ROOT/proetus_global_edits_v0.1.0"
+LUREVA_PROETUS_ORIGINALS = "$LUREVA_PROETUS_CORPUS/originals"
+
+[modules.cloud.lureva.emit.aliases]
+cd-lureva       = "cd \"$LUREVA_REPO\""
+lurevadata   = "cd \"$LUREVA_DATA_ROOT\""
+lurevacorpus = "cd \"$LUREVA_PROETUS_CORPUS\""
 
 
 # -------------------------------------------------------------------
@@ -384,37 +419,6 @@ WHISK_ML_ROOT = "$WHISK/work/ml"
 WHISK_MOUNTED = "1"
 
 [modules.cloud.whisk_other.emit.env_derived]
-WHISK_ML_MODELS       = "$WHISK_ML_ROOT/models"
-WHISK_ML_DATASETS     = "$WHISK_ML_ROOT/datasets"
-WHISK_ML_EXPERIMENTS  = "$WHISK_ML_ROOT/experiments"
-WHISK_ML_LOGS         = "$WHISK_ML_ROOT/logs"
-WHISK_ML_SCRIPTS      = "$WHISK_ML_ROOT/scripts"
-WHISK_ML_PROJECTS     = "$WHISK_ML_ROOT/projects"
-
-# -------------------------------------------------------------------
-# whisk travel copy on Orion
-# Used only on eclipse while traveling.
-# Mirrors the network WHISK ZFS share.
-# -------------------------------------------------------------------
-[modules.cloud.whisk_orion]
-enabled   = true
-kind      = "storage"
-platforms = ["mac"]
-priority  = 330
-hosts     = ["eclipse"]
-
-[modules.cloud.whisk_orion.detect.paths.mac]
-any_of = [
-  "/Volumes/Orion/Clariform/whisk/work/ml",
-]
-
-[modules.cloud.whisk_orion.emit.env]
-WHISK = "/Volumes/Orion/Clariform/whisk"
-WHISK_ML_ROOT = "$WHISK/work/ml"
-WHISK_MOUNTED = "1"
-WHISK_SOURCE = "orion"
-
-[modules.cloud.whisk_orion.emit.env_derived]
 WHISK_ML_MODELS       = "$WHISK_ML_ROOT/models"
 WHISK_ML_DATASETS     = "$WHISK_ML_ROOT/datasets"
 WHISK_ML_EXPERIMENTS  = "$WHISK_ML_ROOT/experiments"
