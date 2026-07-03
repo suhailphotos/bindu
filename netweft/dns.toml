@@ -7,8 +7,8 @@ default_ttl = 86400
 negative_ttl = 604800
 
 [dns.soa]
-primary_nameserver = "ns1.suhail.ink."
-responsible_mailbox = "admin.suhail.ink."
+primary_nameserver = "ns1.internal.suhail.ink."
+responsible_mailbox = "admin.internal.suhail.ink."
 refresh = 86400
 retry = 7200
 expire = 3600000
@@ -24,8 +24,31 @@ include_docker_networks = true
 ipv4 = ["1.1.1.1", "1.0.0.1"]
 ipv6 = ["2606:4700:4700::1111", "2606:4700:4700::1001"]
 
+# Cloudflare remains authoritative for the public suhail.ink zone.
+# BIND is authoritative only for the private namespace and selected
+# more-specific service names that should resolve directly to Nexus on LAN.
 [[zones]]
-name = "suhail.ink"
+name = "internal.suhail.ink"
+visibility = "internal"
+authoritative = true
+
+[[zones]]
+name = "dsm.suhail.ink"
+visibility = "internal"
+authoritative = true
+
+[[zones]]
+name = "ds1621plus.suhail.ink"
+visibility = "internal"
+authoritative = true
+
+[[zones]]
+name = "zion.suhail.ink"
+visibility = "internal"
+authoritative = true
+
+[[zones]]
+name = "jellyfin.suhail.ink"
 visibility = "internal"
 authoritative = true
 
@@ -45,7 +68,7 @@ visibility = "internal"
 authoritative = true
 
 [[records]]
-name = "nexus.suhail.ink"
+name = "nexus.internal.suhail.ink"
 kind = "host"
 target = "nexus"
 interface = "lan"
@@ -77,7 +100,7 @@ families = ["ipv4"]
 reverse = false
 
 [[records]]
-name = "ds1621plus.suhail.ink"
+name = "ds1621plus.internal.suhail.ink"
 kind = "host"
 target = "ds1621plus"
 interface = "lan"
@@ -85,7 +108,7 @@ families = ["ipv4"]
 reverse = true
 
 [[records]]
-name = "ds1621.suhail.ink"
+name = "ds1621.internal.suhail.ink"
 kind = "host"
 target = "ds1621plus"
 interface = "lan"
@@ -93,15 +116,7 @@ families = ["ipv4"]
 reverse = false
 
 [[records]]
-name = "nginx.suhail.ink"
-kind = "service"
-target = "nginx"
-address_scope = "ingress"
-families = ["ipv4"]
-reverse = false
-
-[[records]]
-name = "quasar.suhail.ink"
+name = "quasar.internal.suhail.ink"
 kind = "host"
 target = "quasar"
 interface = "lan"
@@ -109,10 +124,11 @@ families = ["ipv4"]
 reverse = true
 
 [[records]]
-name = "zion.suhail.ink"
+name = "zion.internal.suhail.ink"
 kind = "host"
 target = "zion"
 interface = "lan"
 families = ["ipv4"]
 reverse = true
+
 

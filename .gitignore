@@ -31,9 +31,14 @@ karabiner/karabiner.json
 
 .bindu_installed
 
+.wrangler/logs/*
+
 # Ignore SwiftPM artifacts
 swiftpm/cache
 swiftpm/security
 
 # netweft
 Netweft.backup.*/
+
+# Cloudflare Wrangler local credentials and state
+.wrangler/
