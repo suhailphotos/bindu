@@ -154,14 +154,18 @@ any_of = [
 [modules.cloud.proetus.emit.env]
 PROETUS_REPO = "{detect.path}"
 
-# Defaults, good for quasar.
+# Proetus/Lureva images now live on Whisk for both quasar and eclipse.
+# Mount Whisk before working on Lureva.
 PROETUS_SCRATCH_ROOT = "{home}/Documents/Scratch/tmp/Proetus"
-PROETUS_IMAGES_ROOT  = "{home}/Mounts/dataLib/Pictures/Images"
+PROETUS_IMAGES_ROOT  = "$WHISK_ML_DATASETS/proetus/images"
 
-# Explicit quasar override, optional but nice for documentation.
 [modules.cloud.proetus.emit.env_hosts.quasar]
 PROETUS_SCRATCH_ROOT = "{home}/Documents/Scratch/tmp/Proetus"
-PROETUS_IMAGES_ROOT  = "{home}/Mounts/dataLib/Pictures/Images"
+PROETUS_IMAGES_ROOT  = "$WHISK_ML_DATASETS/proetus/images"
+
+[modules.cloud.proetus.emit.env_hosts.eclipse]
+PROETUS_SCRATCH_ROOT = "{home}/Documents/Scratch/tmp/Proetus"
+PROETUS_IMAGES_ROOT  = "$WHISK_ML_DATASETS/proetus/images"
 
 [modules.cloud.proetus.emit.env_derived]
 PROETUS_DATA_ROOT          = "$PROETUS_REPO/data"
