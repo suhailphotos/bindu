@@ -13,35 +13,52 @@ filenames:
       is_bold: true
       is_underline: false
 
-  uv.lock:
-    filename:
-      foreground: White
-      is_dimmed: true
-      is_bold: false
-      is_underline: false
-
-
-  WORKFLOW.md:
-    filename:
-      foreground: White
-      is_dimmed: true
-      is_bold: true
-      is_underline: false
-
-
-  WORKFLOW.md:
-    filename:
-      foreground: White
-      is_dimmed: true
-      is_bold: true
-      is_underline: false
-
   README.md:
     filename:
       foreground: White
       is_dimmed: true
       is_bold: true
       is_underline: false
+
+  CHANGELOG:
+    filename:
+      foreground: White
+      is_bold: true
+      is_underline: false
+
+  CHANGELOG.md:
+    filename:
+      foreground: White
+      is_dimmed: true
+      is_bold: true
+      is_underline: false
+
+  WORKFLOW:
+    filename:
+      foreground: White
+      is_bold: true
+      is_underline: false
+
+  WORKFLOW.md:
+    filename:
+      foreground: White
+      is_dimmed: true
+      is_bold: true
+      is_underline: false
+
+  SECURITY:
+    filename:
+      foreground: White
+      is_bold: true
+      is_underline: false
+
+  SECURITY.md:
+    filename:
+      foreground: White
+      is_dimmed: true
+      is_bold: true
+      is_underline: false
+
 
   LICENSE:
     filename:
