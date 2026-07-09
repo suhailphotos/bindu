@@ -9,10 +9,10 @@ workspace_page_url = "https://app.notion.com/p/Codexa-398a1865b187817db7dddde6e5
 
 [notion.database]
 name = "Knowledge"
-id = ""
+id = "9b6b6739-a293-4de7-b37c-879927b1cb1e"
 
 [notion.data_sources.documents]
 name = "Documents"
 kind = "documents"
-id = ""
+id = "7946f317-4af9-41dd-b720-a384568808b8"
 
