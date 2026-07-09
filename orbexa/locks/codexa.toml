@@ -2,8 +2,8 @@ schema = "orbexa/lock@1"
 
 [[pages]]
 codexa_id = "workflows.playbooks.lureva-lightroom-handoff"
-notion_page_id = "398a1865-b187-8147-b3cf-eab5a6fd5303"
-notion_page_url = "https://app.notion.com/p/Lureva-Lightroom-Handoff-Manual-398a1865b1878147b3cfeab5a6fd5303"
+notion_page_id = "398a1865-b187-8189-bc1e-dea1cc74e318"
+notion_page_url = "https://app.notion.com/p/Lureva-Lightroom-Handoff-Manual-398a1865b1878189bc1edea1cc74e318"
 workspace = "codexa"
 data_source = "documents"
 source_repository = "archivora/knowledge"
