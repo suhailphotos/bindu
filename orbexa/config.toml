@@ -2,7 +2,7 @@ schema = "orbexa/config@1"
 
 [notion]
 api_version = "2026-03-11"
-parent_page_id = "replace-with-shared-parent-page-id"
+parent_page_id = "398a1865b187802aa885d97afc99896f"
 
 [notion.bootstrap]
 mode = "create"
