@@ -1,0 +1,13 @@
+schema = "orbexa/lock@1"
+
+[[pages]]
+codexa_id = "workflows.playbooks.lureva-lightroom-handoff"
+notion_page_id = "398a1865-b187-8147-b3cf-eab5a6fd5303"
+notion_page_url = "https://app.notion.com/p/Lureva-Lightroom-Handoff-Manual-398a1865b1878147b3cfeab5a6fd5303"
+workspace = "codexa"
+data_source = "documents"
+source_repository = "archivora/knowledge"
+source_path = "workflows/playbooks/lureva-lightroom-handoff.md"
+source_commit = "unknown"
+content_hash = "sha256:27f7758acbd4530324baf21556cdf76695548d077033f49858ae9eae582348b3"
+
