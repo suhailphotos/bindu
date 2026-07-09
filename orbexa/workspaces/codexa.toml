@@ -1,18 +1,29 @@
+
 schema = "orbexa/workspace@1"
 
 name = "Codexa"
 
 [notion]
+
 parent_page_id = "398a1865b187802aa885d97afc99896f"
+
 workspace_page_id = "398a1865-b187-817d-b7dd-dde6e5fa9828"
+
 workspace_page_name = "Codexa"
+
 workspace_page_url = "https://app.notion.com/p/Codexa-398a1865b187817db7dddde6e5fa9828"
 
 [notion.database]
+
 name = "Knowledge"
+
 id = ""
 
 [notion.data_sources.documents]
+
 name = "Documents"
+
 kind = "documents"
+
 id = ""
+
