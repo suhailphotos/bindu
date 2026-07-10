@@ -24,3 +24,11 @@ mode = "export"
 managed_by = "orbexa"
 on_missing = "mark_stale"
 on_drift = "warn_and_skip"
+
+[workspace.data_sources.documents.appearance.icon]
+type = "emoji"
+emoji = "📘"
+
+[workspace.data_sources.documents.appearance.cover]
+type = "external"
+url = "https://images.unsplash.com/photo-1519389950473-47ba0277781c"
