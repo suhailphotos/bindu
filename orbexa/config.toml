@@ -1,4 +1,4 @@
-schema = "orbexa/config@1"
+schema = "orbexa/config@2"
 
 [notion]
 api_version = "2026-03-11"
@@ -10,25 +10,42 @@ root = "parent_page"
 
 [workspace]
 page_name = "Codexa"
-database_name = "Knowledge"
 
-[workspace.data_sources.documents]
-name = "Documents"
-kind = "documents"
+[workspace.appearance.icon]
+type = "emoji"
+emoji = "🧭"
+
+[workspace.appearance.cover]
+type = "external"
+url = "https://res.cloudinary.com/dicttuyma/image/upload/w_1500,h_600,c_fill,g_auto/v1742094786/banner/notion_22.jpg"
+
+[workspace.roots.docs]
+database_name = "Docs"
+data_source_name = "Documents"
+
+[workspace.roots.docs.appearance.icon]
+type = "emoji"
+emoji = "📘"
+
+[workspace.roots.docs.appearance.cover]
+type = "external"
+url = "https://res.cloudinary.com/dicttuyma/image/upload/w_1500,h_600,c_fill,g_auto/v1742094786/banner/notion_22.jpg"
+
+[workspace.roots.knowledge]
+database_name = "Knowledge"
+data_source_name = "Documents"
+
+[workspace.roots.knowledge.appearance.icon]
+type = "emoji"
+emoji = "📚"
+
+[workspace.roots.knowledge.appearance.cover]
+type = "external"
+url = "https://res.cloudinary.com/dicttuyma/image/upload/w_1500,h_600,c_fill,g_auto/v1742094786/banner/notion_22.jpg"
 
 [artifacts]
 input = "../codexa/dist/notion"
 
 [sync]
-mode = "export"
-managed_by = "orbexa"
-on_missing = "mark_stale"
-on_drift = "warn_and_skip"
-
-[workspace.data_sources.documents.appearance.icon]
-type = "emoji"
-emoji = "📘"
-
-[workspace.data_sources.documents.appearance.cover]
-type = "external"
-url = "https://images.unsplash.com/photo-1519389950473-47ba0277781c"
+on_missing = "recreate"
+on_drift = "update"

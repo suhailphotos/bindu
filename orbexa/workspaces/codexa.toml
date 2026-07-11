@@ -1,4 +1,4 @@
-schema = "orbexa/workspace@1"
+schema = "orbexa/workspace@2"
 name = "Codexa"
 
 [notion]
@@ -7,12 +7,15 @@ workspace_page_id = "398a1865-b187-817d-b7dd-dde6e5fa9828"
 workspace_page_name = "Codexa"
 workspace_page_url = "https://app.notion.com/p/Codexa-398a1865b187817db7dddde6e5fa9828"
 
-[notion.database]
-name = "Knowledge"
-id = "53a7f7f5-2f72-438b-8dcd-9b9482210952"
+[notion.roots.docs]
+database_name = "Docs"
+database_id = "aaa83f8c-256d-4cf8-a1d1-61d8b442661e"
+data_source_name = "Documents"
+data_source_id = "80e45781-6d19-44b5-8145-e5d0fe9f2751"
 
-[notion.data_sources.documents]
-name = "Documents"
-kind = "documents"
-id = "fe7ca8ca-d502-4362-b63a-1b2b313a82bf"
+[notion.roots.knowledge]
+database_name = "Knowledge"
+database_id = "45e90131-75cd-4c8d-b447-7a0b15ff21ac"
+data_source_name = "Documents"
+data_source_id = "37096c02-2783-4fb3-8f86-db099608398f"
 
