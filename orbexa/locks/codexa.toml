@@ -9,5 +9,5 @@ source_repository = "orbyts/codexa"
 source_path = "tests/fixtures/runbooks/lureva-lightroom-handoff.md"
 source_commit = "660462eee79a12aed0aad2fd4817fce4f7f044e1"
 source_content_hash = "sha256:fa48863203cc15cdbca8ba45831cf53f9d88bfe3313efd49f4977b0dc1e89ee8"
-rendered_content_hash = "sha256:fa48863203cc15cdbca8ba45831cf53f9d88bfe3313efd49f4977b0dc1e89ee8"
+rendered_content_hash = "sha256:1242542d426855219add0df8dfc9d8be85cffda19c875785c313db578f416946"
 
