@@ -24,8 +24,9 @@ database_name = "Docs"
 data_source_name = "Documents"
 
 [workspace.roots.docs.appearance.icon]
-type = "emoji"
-emoji = "📘"
+type = "icon"
+name = "book"
+color = "lightgray"
 
 [workspace.roots.docs.appearance.cover]
 type = "external"
@@ -36,8 +37,9 @@ database_name = "Knowledge"
 data_source_name = "Documents"
 
 [workspace.roots.knowledge.appearance.icon]
-type = "emoji"
-emoji = "📚"
+type = "icon"
+name = "book"
+color = "lightgray"
 
 [workspace.roots.knowledge.appearance.cover]
 type = "external"
